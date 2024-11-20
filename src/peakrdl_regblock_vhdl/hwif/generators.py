@@ -278,9 +278,9 @@ class EnumGenerator:
 
     @staticmethod
     def _get_prefix(user_enum: Type['UserEnum']) -> str:
-        scope = user_enum.get_scope_path("__")
+        scope = user_enum.get_scope_path(".")
         if scope:
-            return f"{scope}__{user_enum.type_name}"
+            return f"{scope}.{user_enum.type_name}"
         else:
             return user_enum.type_name
 
@@ -298,6 +298,7 @@ class EnumGenerator:
             datatype = f'std_logic_vector({max_value.bit_length() - 1} downto 0) := {max_value.bit_length()}x"{{0}}"'
 
         for enum_member in user_enum:
-            lines.append(f"constant {prefix}__{enum_member.name} : {datatype.format(enum_member.value,'x')};")
+            constname = kwf(f"{prefix}.{enum_member.name}")
+            lines.append(f"constant {constname} : {datatype.format(enum_member.value,'x')};")
 
         return "\n".join(lines)
