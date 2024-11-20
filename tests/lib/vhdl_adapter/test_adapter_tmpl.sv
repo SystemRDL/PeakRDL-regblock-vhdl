@@ -33,8 +33,10 @@ module regblock_adapter_sv
         .{{default_resetsignal_name}}({{default_resetsignal_name}}),
 
         {%- for cpuif_sig, _ in cpuif_signals %}
-        .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }}),
+        .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }})
+        {%- if not loop.last %},{% endif -%}
         {%- endfor %}
+        {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 
         {%- for hwif_sig, _ in hwif_signals %}
         .{{ escape(hwif_sig) }}({{ hwif_sig }})

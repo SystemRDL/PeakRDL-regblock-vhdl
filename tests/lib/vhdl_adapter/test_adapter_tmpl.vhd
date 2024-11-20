@@ -31,8 +31,10 @@ entity regblock_adapter_vhdl is
         {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : in {{ sig_type(width) }};
         {%- endfor %}
         {%- for cpuif_sig, width in cpuif_signals_out %}
-        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : out {{ sig_type(width) }};
+        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : out {{ sig_type(width) }}
+        {%- if not loop.last %};{% endif -%}
         {%- endfor %}
+        {%- if hwif.has_input_struct or hwif.has_output_struct %};{% endif %}
 
         {%- for hwif_sig, width in hwif_signals %}
         {%- if hwif_sig.startswith("hwif_in") %}
@@ -73,8 +75,10 @@ begin
             {{ vhdl_cpuif.signal(cpuif_sig) }} => {{ kwf(sv_cpuif.signal(cpuif_sig)) }},
             {%- endfor %}
             {%- for cpuif_sig, _ in cpuif_signals_out %}
-            {{ vhdl_cpuif.signal(cpuif_sig) }} => {{ kwf(sv_cpuif.signal(cpuif_sig)) }},
+            {{ vhdl_cpuif.signal(cpuif_sig) }} => {{ kwf(sv_cpuif.signal(cpuif_sig)) }}
+            {%- if not loop.last %},{% endif -%}
             {%- endfor %}
+            {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 
             {%- for hwif_sig, _ in hwif_signals %}
             {{ hwif_sig.replace("][", ", ").replace("[", "(").replace("]", ")") }} => \{{ hwif_sig }}\
