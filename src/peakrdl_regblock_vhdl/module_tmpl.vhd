@@ -172,7 +172,7 @@ begin
             elsif cpuif_req and not cpuif_req_is_wr then
                 cpuif_req_stall_sr <= (others => '0');
             else
-                cpuif_req_stall_sr <= "0" & cpuif_req_stall_sr(cpuif_req_stall_sr'high downto 1);
+                cpuif_req_stall_sr <= std_logic_vector(shift_right(unsigned(cpuif_req_stall_sr), 1));
             end if;
         end if;
     end process;
@@ -194,7 +194,7 @@ begin
             elsif cpuif_req and cpuif_req_is_wr then
                 cpuif_req_stall_sr <= '1';
             else
-                cpuif_req_stall_sr <= "0" & cpuif_req_stall_sr(cpuif_req_stall_sr'high downto 1);
+                cpuif_req_stall_sr <= std_logic_vector(shift_right(unsigned(cpuif_req_stall_sr), 1));
             end if;
         end if;
     end process;
