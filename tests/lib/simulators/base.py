@@ -22,7 +22,7 @@ class Simulator:
         files = []
         files.extend(file for file in self.testcase.cpuif.get_sim_files() if file.endswith(".sv"))
         files.extend(file for file in self.testcase.get_extra_tb_files() if file.endswith(".sv"))
-        files.append("sv_regblock_pkg.sv")
+        files.append("regblock_pkg.sv")
         files.append("regblock_adapter.sv")
         files.append("tb.sv")
 
