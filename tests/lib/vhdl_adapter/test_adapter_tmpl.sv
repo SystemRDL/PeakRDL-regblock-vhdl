@@ -32,7 +32,7 @@ module regblock_adapter_sv
         .clk(clk),
         .{{default_resetsignal_name}}({{default_resetsignal_name}}),
 
-        {%- for cpuif_sig, _ in cpuif_signals %}
+        {%- for cpuif_sig, _, _ in cpuif_signals %}
         .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }})
         {%- if not loop.last %},{% endif -%}
         {%- endfor %}

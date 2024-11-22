@@ -20,32 +20,34 @@ class AXI4Lite(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, int]]:
+    def input_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, bool, int]]:
+        """Return tuples of (name, is_vector, width)"""
         return [
-            ("awvalid", 1),
-            ("awaddr",  cpuif.addr_width),
-            ("awprot",  3),
-            ("wvalid",  1),
-            ("wdata",   cpuif.data_width),
-            ("wstrb",   cpuif.data_width_bytes),
-            ("bready",  1),
-            ("arvalid", 1),
-            ("araddr",  cpuif.addr_width),
-            ("arprot",  3),
-            ("rready",  1),
+            ("awvalid", False, 1),
+            ("awaddr",  True,  cpuif.addr_width),
+            ("awprot",  True,  3),
+            ("wvalid",  False, 1),
+            ("wdata",   True,  cpuif.data_width),
+            ("wstrb",   True,  cpuif.data_width_bytes),
+            ("bready",  False, 1),
+            ("arvalid", False, 1),
+            ("araddr",  True,  cpuif.addr_width),
+            ("arprot",  True,  3),
+            ("rready",  False, 1),
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, int]]:
+    def output_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, bool, int]]:
+        """Return tuples of (name, is_vector, width)"""
         return [
-            ("awready", 1),
-            ("wready",  1),
-            ("bvalid",  1),
-            ("bresp",   2),
-            ("arready", 1),
-            ("rvalid",  1),
-            ("rdata",   cpuif.data_width),
-            ("rresp",   2),
+            ("awready", False, 1),
+            ("wready",  False, 1),
+            ("bvalid",  False, 1),
+            ("bresp",   True,  2),
+            ("arready", False, 1),
+            ("rvalid",  False, 1),
+            ("rdata",   True,  cpuif.data_width),
+            ("rresp",   True,  2),
         ]
 
 

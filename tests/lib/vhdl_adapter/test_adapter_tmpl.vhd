@@ -2,8 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-{%- macro sig_type(width) %}
-{%- if width == 1 -%}
+{%- macro sig_type(width, is_vec=False) %}
+{%- if width == 1 and not is_vec -%}
 std_logic
 {%- else -%}
 std_logic_vector({{width-1}} downto 0)
@@ -27,11 +27,11 @@ entity regblock_adapter_vhdl is
         parity_error : out std_logic;
         {%- endif %}
 
-        {%- for cpuif_sig, width in cpuif_signals_in %}
-        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : in {{ sig_type(width) }};
+        {%- for cpuif_sig, is_vec, width in cpuif_signals_in %}
+        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : in {{ sig_type(width, is_vec) }};
         {%- endfor %}
-        {%- for cpuif_sig, width in cpuif_signals_out %}
-        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : out {{ sig_type(width) }}
+        {%- for cpuif_sig, is_vec, width in cpuif_signals_out %}
+        {{ kwf(sv_cpuif.signal(cpuif_sig)) }} : out {{ sig_type(width, is_vec) }}
         {%- if not loop.last %};{% endif -%}
         {%- endfor %}
         {%- if hwif.has_input_struct or hwif.has_output_struct %};{% endif %}
@@ -71,12 +71,12 @@ begin
             parity_error => parity_error,
             {%- endif %}
 
-            {%- for cpuif_sig, _ in cpuif_signals_in %}
+            {%- for cpuif_sig, _, _ in cpuif_signals_in %}
             {{ vhdl_cpuif.signal(cpuif_sig) }} => {{ kwf(sv_cpuif.signal(cpuif_sig)) }},
             {%- endfor %}
-            {%- for cpuif_sig, _ in cpuif_signals_out %}
+            {%- for cpuif_sig, _, _ in cpuif_signals_out %}
             {{ vhdl_cpuif.signal(cpuif_sig) }} => {{ kwf(sv_cpuif.signal(cpuif_sig)) }}
-            {%- if not loop.last %},{% endif -%}
+            {%-   if not loop.last %},{% endif -%}
             {%- endfor %}
             {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 

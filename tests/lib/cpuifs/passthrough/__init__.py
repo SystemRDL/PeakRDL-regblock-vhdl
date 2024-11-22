@@ -13,23 +13,25 @@ class Passthrough(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, int]]:
+    def input_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, bool, int]]:
+        """Return tuples of (name, is_vector, width)"""
         return [
-            ("s_cpuif_req", 1),
-            ("s_cpuif_req_is_wr", 1),
-            ("s_cpuif_addr", cpuif.addr_width),
-            ("s_cpuif_wr_data", cpuif.data_width),
-            ("s_cpuif_wr_biten", cpuif.data_width),
+            ("s_cpuif_req",       False, 1),
+            ("s_cpuif_req_is_wr", False, 1),
+            ("s_cpuif_addr",      True,  cpuif.addr_width),
+            ("s_cpuif_wr_data",   True,  cpuif.data_width),
+            ("s_cpuif_wr_biten",  True,  cpuif.data_width),
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, int]]:
+    def output_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, bool, int]]:
+        """Return tuples of (name, is_vector, width)"""
         return [
-            ("s_cpuif_req_stall_wr", 1),
-            ("s_cpuif_req_stall_rd", 1),
-            ("s_cpuif_rd_ack", 1),
-            ("s_cpuif_rd_err", 1),
-            ("s_cpuif_rd_data", cpuif.data_width),
-            ("s_cpuif_wr_ack", 1),
-            ("s_cpuif_wr_err", 1),
+            ("s_cpuif_req_stall_wr", False, 1),
+            ("s_cpuif_req_stall_rd", False, 1),
+            ("s_cpuif_rd_ack",       False, 1),
+            ("s_cpuif_rd_err",       False, 1),
+            ("s_cpuif_rd_data",      True,  cpuif.data_width),
+            ("s_cpuif_wr_ack",       False, 1),
+            ("s_cpuif_wr_err",       False, 1),
         ]
