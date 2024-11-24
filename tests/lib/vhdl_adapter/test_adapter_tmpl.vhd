@@ -81,8 +81,8 @@ begin
             {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 
             {%- for hwif_sig, _ in hwif_signals %}
-            {{ hwif_sig.replace("][", ", ").replace("[", "(").replace("]", ")") }} => \{{ hwif_sig }}\
-            {%- if not loop.last %},{% endif -%}
+            {{ hwif_sv_to_vhdl(hwif_sig) }} => \{{ hwif_sig }}\
+            {%-   if not loop.last %},{% endif -%}
             {%- endfor %}
         );
 

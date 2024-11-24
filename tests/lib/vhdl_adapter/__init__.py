@@ -58,6 +58,7 @@ class VhdlAdapter:
             "hwif": self.sv_exporter.hwif,
             "hwif_signals": hwif_signals,
             "default_resetsignal_name": self.sv_exporter.dereferencer.default_resetsignal_name,
+            "hwif_sv_to_vhdl": hwif_sv_to_vhdl,
             "kwf": kw_filter,
         }
 
@@ -71,6 +72,17 @@ class VhdlAdapter:
             template = self.jj_env.get_template(adapter_tmpl)
             stream = template.stream(context)
             stream.dump(adapter_file_path)
+
+
+def hwif_sv_to_vhdl(identifier: str) -> str:
+    """Convert SV indexing to VHDL matrix indexing. Also change `next` to `next_q`.
+
+    For example, `reg[6].something[1][2][3].next` becomes `reg(6).something(1, 2, 3).next_q`.
+    """
+    result = identifier.replace("][", ", ").replace("[", "(").replace("]", ")")
+    if result.endswith(".next"):
+        result += "_q"
+    return result
 
 
 class SvInputStructSignals(InputStructGenerator_Hier):
