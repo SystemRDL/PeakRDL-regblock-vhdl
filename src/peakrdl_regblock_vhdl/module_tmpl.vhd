@@ -170,7 +170,7 @@ begin
             if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
                 cpuif_req_stall_sr <= (others => '0');
             elsif cpuif_req and not cpuif_req_is_wr then
-                cpuif_req_stall_sr <= (others => '0');
+                cpuif_req_stall_sr <= (others => '1');
             else
                 cpuif_req_stall_sr <= std_logic_vector(shift_right(unsigned(cpuif_req_stall_sr), 1));
             end if;
