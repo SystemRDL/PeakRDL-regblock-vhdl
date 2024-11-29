@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional, Self
 from enum import Enum
 
@@ -16,7 +17,7 @@ class VhdlIntType(Enum):
 
 
 class VhdlInt:
-    """VHDL integer literal
+    """VHDL unsigned integer literal
 
     If width is not specified, the bit width required to represent the integer is used.
 
@@ -64,6 +65,26 @@ class VhdlInt:
                 else:
                     raise ValueError(f"AGGREGATE type VhdlInt only supports all zeros or all ones (got {self.value}, width {self.width})")
 
+    def resize(self, new_width: int) -> Self:
+        """Change the width of the VhdlInt"""
+        new = deepcopy(self)
+        new.width = new_width
+        width = self.width if self.width is not None else self.value.bit_length()
+        if self.kind == VhdlIntType.AGGREGATE:
+            if self.value == 0:
+                return new
+            elif self.value == 2**width - 1:
+                new.value = 2**new_width - 1
+                return new
+            else:
+                raise ValueError(f"AGGREGATE type VhdlInt only supports all zeros or all ones (got {self.value}, width {self.width})")
+
+        min_bits = self.value.bit_length()
+        if new_width < min_bits:
+            raise ValueError(f"Value {self.value} cannot be represented with only {new_width} bits")
+
+        return new
+
     @classmethod
     def ones(cls, width: Optional[int] = None, allow_std_logic: bool = True) -> Self:
         """All ones aggregate "(others => '1')"
@@ -104,3 +125,14 @@ class VhdlInt:
         """Unsigned string literal, such as 5Ux"1E"
         """
         return cls(value, width=width, kind=VhdlIntType.BIT_STRING_UNSIGNED, allow_std_logic=allow_std_logic)
+
+
+def zero_pad(identifier: VhdlInt | str, num=1) -> VhdlInt | str:
+    """Pad `num` zeros on the left (unsigned sign extension)
+
+    If str, assume it is a VHDL identifier.
+    """
+    if isinstance(identifier, VhdlInt):
+        return identifier.resize(identifier.width + num)
+    else:
+        return f'"{"0"*num}" & {identifier}'
