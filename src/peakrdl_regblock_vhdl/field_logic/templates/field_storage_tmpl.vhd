@@ -75,16 +75,15 @@ process({{get_always_ff_event(resetsignal)}}) begin
         elsif {{field_logic.get_field_combo_identifier(node, "load_next")}} then
             {{- field_set() | indent(8) }}
         end if;
-    end if;
     {%- else %}
     if rising_edge(clk) then
         if {{field_logic.get_field_combo_identifier(node, "load_next")}} then
             {{- field_set() | indent(8) }}
         end if;
-    end if;
     {%- endif %}
 
-    {%- if field_logic.has_next_q(node) %}
-    {{field_logic.get_next_q_identifier(node)}} <= {{get_input_identifier(node)}};
-    {%- endif %}
+        {%- if field_logic.has_next_q(node) %}
+        {{field_logic.get_next_q_identifier(node)}} <= {{get_input_identifier(node)}};
+        {%- endif %}
+    end if;
 end process;
