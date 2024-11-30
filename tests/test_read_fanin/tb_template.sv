@@ -30,5 +30,5 @@
         cpuif.assert_read(i*STRIDE, data[i]);
     end
 
-    assert($bits(dut.cpuif_wr_data) == REGWIDTH);
+    assert($bits(dut.adpt_vhdl.dut.cpuif_wr_data) == REGWIDTH);
 {% endblock %}
