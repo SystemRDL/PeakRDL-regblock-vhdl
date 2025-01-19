@@ -32,6 +32,10 @@ module regblock_adapter_sv
         .clk(clk),
         .{{default_resetsignal_name}}({{default_resetsignal_name}}),
 
+        {%- if ds.has_paritycheck %}
+        .parity_error(parity_error),
+        {%- endif %}
+
         {%- for cpuif_sig, _, _ in cpuif_signals %}
         .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }})
         {%- if not loop.last %},{% endif -%}

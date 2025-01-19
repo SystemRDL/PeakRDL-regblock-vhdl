@@ -288,7 +288,7 @@ begin
                 parity_error <= '0';
             else
                 err := '0';
-                {{parity.get_implementation()|indent(12)}}
+                {{parity.get_implementation()|indent(16)}}
                 parity_error <= err;
             end if;
         end if;
