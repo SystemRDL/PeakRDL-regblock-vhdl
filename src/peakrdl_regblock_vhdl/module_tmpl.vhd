@@ -103,6 +103,14 @@ architecture rtl of {{ds.module_name}} is
 
     {{field_logic.get_storage_struct()|indent}}
 
+{%- if ds.has_buffered_write_regs %}
+
+    ----------------------------------------------------------------------------
+    -- Write Buffer Signals
+    ----------------------------------------------------------------------------
+    {{write_buffering.get_storage_struct()|indent}}
+{%- endif %}
+
 {%- if ds.has_buffered_read_regs %}
 
     ----------------------------------------------------------------------------
@@ -256,7 +264,6 @@ begin
     ----------------------------------------------------------------------------
     -- Write double-buffers
     ----------------------------------------------------------------------------
-    {{write_buffering.get_storage_struct()|indent}}
 
     {{write_buffering.get_implementation()|indent}}
 {%- endif %}

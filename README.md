@@ -3,8 +3,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/SystemRDL/PeakRDL-regblock/badge.svg?branch=main)](https://coveralls.io/github/SystemRDL/PeakRDL-regblock?branch=main)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-regblock.svg)](https://pypi.org/project/peakrdl-regblock)
 
-# PeakRDL-regblock
-Compile SystemRDL into a SystemVerilog control/status register (CSR) block.
+# PeakRDL-regblock-VHDL
+Compile SystemRDL into a VHDL control/status register (CSR) block. This is a VHDL port of the [SystemVerliog PeakRDL-regblock exporter](https://github.com/SystemRDL/PeakRDL-regblock).
 
 For the command line tool, see the [PeakRDL project](https://peakrdl.readthedocs.io).
 
