@@ -1,15 +1,36 @@
+from typing import Union
 from ..base import CpuifBase
 from ...utils import clog2
 
 class Avalon_Cpuif(CpuifBase):
-    template_path = "avalon_tmpl.sv"
+    template_path = "avalon_tmpl.vhd"
+
+    @property
+    def package_name(self) -> Union[str, None]:
+        return "avalon_mm_intf_pkg"
 
     @property
     def port_declaration(self) -> str:
-        return "avalon_mm_intf.agent avalon"
+        return "\n".join([
+            "avalon_i : in avalon_agent_in_intf(",
+           f"    address({self.word_addr_width-1} downto 0),",
+           f"    writedata({self.data_width-1} downto 0),",
+           f"    byteenable({self.data_width_bytes-1} downto 0)",
+            ");",
+            "avalon_o : out avalon_agent_out_intf(",
+           f"    readdata({self.data_width-1} downto 0)",
+            ")",
+        ])
+
+    @property
+    def signal_declaration(self) -> str:
+        return ""
 
     def signal(self, name:str) -> str:
-        return "avalon." + name
+        if name.lower() in ("read", "write", "address", "writedata", "byteenable"):
+            return "avalon_i." + name
+        else:
+            return "avalon_o." + name
 
     @property
     def word_addr_width(self) -> int:
@@ -20,18 +41,18 @@ class Avalon_Cpuif_flattened(Avalon_Cpuif):
     @property
     def port_declaration(self) -> str:
         lines = [
-            "input wire " + self.signal("read"),
-            "input wire " + self.signal("write"),
-            "output logic " + self.signal("waitrequest"),
-            f"input wire [{self.word_addr_width-1}:0] " + self.signal("address"),
-            f"input wire [{self.data_width-1}:0] " + self.signal("writedata"),
-            f"input wire [{self.data_width_bytes-1}:0] " + self.signal("byteenable"),
-            "output logic " + self.signal("readdatavalid"),
-            "output logic " + self.signal("writeresponsevalid"),
-            f"output logic [{self.data_width-1}:0] " + self.signal("readdata"),
-            "output logic [1:0] " + self.signal("response"),
+            self.signal("read")               +  " : in std_logic;",
+            self.signal("write")              +  " : in std_logic;",
+            self.signal("waitrequest")        +  " : out std_logic;",
+            self.signal("address")            + f" : in std_logic_vector({self.word_addr_width-1} downto 0);",
+            self.signal("writedata")          + f" : in std_logic_vector({self.data_width-1} downto 0);",
+            self.signal("byteenable")         + f" : in std_logic_vector({self.data_width_bytes-1} downto 0);",
+            self.signal("readdatavalid")      +  " : out std_logic;",
+            self.signal("writeresponsevalid") +  " : out std_logic;",
+            self.signal("readdata")           + f" : out std_logic_vector({self.data_width-1} downto 0);",
+            self.signal("response")           +  " : out std_logic_vector(1 downto 0)",
         ]
-        return ",\n".join(lines)
+        return "\n".join(lines)
 
     def signal(self, name:str) -> str:
         return "avalon_" + name
