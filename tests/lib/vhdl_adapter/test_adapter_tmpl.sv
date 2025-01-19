@@ -32,6 +32,10 @@ module regblock_adapter_sv
         .clk(clk),
         .{{default_resetsignal_name}}({{default_resetsignal_name}}),
 
+        {%- for signal in ds.out_of_hier_signals.values() %}
+        .{{kwf(signal.inst_name)}}({{kwf(signal.inst_name)}}),
+        {%- endfor %}
+
         {%- if ds.has_paritycheck %}
         .parity_error(parity_error),
         {%- endif %}
