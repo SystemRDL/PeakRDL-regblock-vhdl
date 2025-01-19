@@ -58,6 +58,7 @@ class VhdlAdapter:
             "hwif": self.sv_exporter.hwif,
             "hwif_signals": hwif_signals,
             "default_resetsignal_name": self.sv_exporter.dereferencer.default_resetsignal_name,
+            "hwif_sv_to_vhdl": hwif_sv_to_vhdl,
             "kwf": kw_filter,
         }
 
@@ -73,34 +74,53 @@ class VhdlAdapter:
             stream.dump(adapter_file_path)
 
 
+def hwif_sv_to_vhdl(identifier: str) -> str:
+    """Convert SV indexing to VHDL matrix indexing. Also change `next` to `next_q`.
+
+    For example, `reg[6].something[1][2][3].next` becomes `reg(6).something(1, 2, 3).next_q`.
+    """
+    result = identifier.replace("][", ", ").replace("[", "(").replace("]", ")")
+    if result.endswith(".next"):
+        result += "_q"
+    return result
+
+
 class SvInputStructSignals(InputStructGenerator_Hier):
     """Monitor signals added via "add_member" to produce a list of HWIF
     input signals and their widths
     """
     def get_signals(self, node: 'Node') -> list[tuple[str, int]]:
-        self.signals = []
+        self.signals = set()
         self.start("don't care")
 
         walker = RDLWalker(unroll=False)
         walker.walk(node, self, skip_top=True)
 
         self.finish()
-        return self.signals
+        return sorted(self.signals)
 
     def add_member(self, name: str, width: int = 1) -> None:
         super().add_member(name, width)
-        results = [""]
+        prefixes = ["hwif_in"]
         for s in self._struct_stack:
             if s.inst_name is None:
                 continue
-            results = [result + "." + s.inst_name for result in results]
+            prefixes = [prefix + "." + s.inst_name for prefix in prefixes]
             if s.array_dimensions:
-                new_results = []
+                new_prefixes = []
                 dim_ranges = [range(dim) for dim in s.array_dimensions]
                 for indices in product(*dim_ranges):
-                    new_results.extend([result + "[" + "][".join(map(str, indices)) + "]" for result in results])
-                results = new_results
-        self.signals.extend([(f"hwif_in{result}.{name}", width) for result in sorted(results)])
+                    new_prefixes.extend([prefix + "[" + "][".join(map(str, indices)) + "]" for prefix in prefixes])
+                prefixes = new_prefixes
+
+        # VHDL doesn't support packed structs, and uses std_logic_vectors instead.
+        # If the innermost struct is packed, then make sure the struct instance itself is represented,
+        # but not any members of the packed struct.
+        if self._struct_stack[-1].packed:
+            width = self.hwif.ds.cpuif_data_width # FIXME: this does not take into account the "regwidth" property
+            self.signals.update((prefix, width) for prefix in prefixes)
+        else:
+            self.signals.update((f"{prefix}.{name}", width) for prefix in prefixes)
 
 
 class SvOutputStructSignals(OutputStructGenerator_Hier):
@@ -108,26 +128,34 @@ class SvOutputStructSignals(OutputStructGenerator_Hier):
     output signals and their widths
     """
     def get_signals(self, node: 'Node') -> list[tuple[str, int]]:
-        self.signals = []
+        self.signals = set()
         self.start("don't care")
 
         walker = RDLWalker(unroll=False)
         walker.walk(node, self, skip_top=True)
 
         self.finish()
-        return self.signals
+        return sorted(self.signals)
 
     def add_member(self, name: str, width: int = 1) -> None:
         super().add_member(name, width)
-        results = [""]
+        prefixes = ["hwif_out"]
         for s in self._struct_stack:
             if s.inst_name is None:
                 continue
-            results = [result + "." + s.inst_name for result in results]
+            prefixes = [prefix + "." + s.inst_name for prefix in prefixes]
             if s.array_dimensions:
-                new_results = []
+                new_prefixes = []
                 dim_ranges = [range(dim) for dim in s.array_dimensions]
                 for indices in product(*dim_ranges):
-                    new_results.extend([result + "[" + "][".join(map(str, indices)) + "]" for result in results])
-                results = new_results
-        self.signals.extend([(f"hwif_out{result}.{name}", width) for result in sorted(results)])
+                    new_prefixes.extend([prefix + "[" + "][".join(map(str, indices)) + "]" for prefix in prefixes])
+                prefixes = new_prefixes
+
+        # VHDL doesn't support packed structs, and uses std_logic_vectors instead.
+        # If the innermost struct is packed, then make sure the struct instance itself is represented,
+        # but not any members of the packed struct.
+        if self._struct_stack[-1].packed:
+            width = self.hwif.ds.cpuif_data_width # FIXME: this does not take into account the "regwidth" property
+            self.signals.update((prefix, width) for prefix in prefixes)
+        else:
+            self.signals.update([(f"{prefix}.{name}", width) for prefix in prefixes])

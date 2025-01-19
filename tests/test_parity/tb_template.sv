@@ -24,9 +24,9 @@
     disable fork;
 
     cpuif.write('h0, 'd0);
-    assign dut.field_storage.r1.f1.value = 16'd1;
-    deassign dut.field_storage.r1.f1.value;
+    $signal_force("dut.adpt_vhdl.dut.field_storage.r1.f1.value", "16#1");
     @cb;
+    $signal_release("dut.adpt_vhdl.dut.field_storage.r1.f1.value");
     @cb;
     assert(cb.parity_error == 1'b1);
     cpuif.write('h0, 'd0);

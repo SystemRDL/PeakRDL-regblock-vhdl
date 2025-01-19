@@ -5,6 +5,7 @@ from systemrdl.node import AddrmapNode, RegNode, SignalNode, FieldNode, Node
 from .implementation_generator import RBufLogicGenerator
 from ..struct_generator import RDLFlatStructGenerator
 from ..utils import get_indexed_path
+from ..identifier_filter import kw_filter as kwf
 
 if TYPE_CHECKING:
     from ..exporter import RegblockExporter
@@ -67,11 +68,11 @@ class RBufStorageStructGenerator(RDLFlatStructGenerator):
     def get_typdef_name(self, node: 'Node', suffix: str = "") -> str:
         base = node.get_rel_path(
             self.top_node.parent,
-            hier_separator="__",
+            hier_separator=".",
             array_suffix="",
             empty_array_suffix=""
         )
-        return f'{base}{suffix}__rbuf_t'
+        return kwf(f'{base}{suffix}_rbuf_t')
 
     def enter_Field(self, node: FieldNode) -> None:
         # suppress parent class's field behavior

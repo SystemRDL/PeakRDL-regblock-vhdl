@@ -23,8 +23,8 @@ class Sticky(NextStateConditional):
     def get_predicate(self, field: 'FieldNode') -> str:
         I = self.exp.hwif.get_input_identifier(field)
         R = self.exp.field_logic.get_storage_identifier(field)
-        zero = VhdlInt.zeros(field.width)
-        return f"({R} = {zero}) and ({I} /= {zero})"
+        zero = VhdlInt.bit_string(0, field.width)
+        return f"to_std_logic({R} = {zero}) and or_reduce({I})"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         I = self.exp.hwif.get_input_identifier(field)
@@ -47,8 +47,7 @@ class Stickybit(NextStateConditional):
 
     def get_predicate(self, field: 'FieldNode') -> str:
         F = self.exp.hwif.get_input_identifier(field)
-        zero = VhdlInt.zeros(field.width)
-        return f"{F} /= {zero}"
+        return f"or_reduce({F})"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         I = self.exp.hwif.get_input_identifier(field)
@@ -73,8 +72,7 @@ class PosedgeStickybit(NextStateConditional):
     def get_predicate(self, field: 'FieldNode') -> str:
         I = self.exp.hwif.get_input_identifier(field)
         Iq = self.exp.field_logic.get_next_q_identifier(field)
-        zero = VhdlInt.zeros(field.width)
-        return f"(not {Iq} and {I}) /= {zero}"
+        return f"or_reduce(not {Iq} and {I})"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         I = self.exp.hwif.get_input_identifier(field)
@@ -100,8 +98,7 @@ class NegedgeStickybit(NextStateConditional):
     def get_predicate(self, field: 'FieldNode') -> str:
         I = self.exp.hwif.get_input_identifier(field)
         Iq = self.exp.field_logic.get_next_q_identifier(field)
-        zero = VhdlInt.zeros(field.width)
-        return f"({Iq} and not {I}) /= {zero}"
+        return f"or_reduce({Iq} and not {I})"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         I = self.exp.hwif.get_input_identifier(field)
@@ -127,7 +124,7 @@ class BothedgeStickybit(NextStateConditional):
     def get_predicate(self, field: 'FieldNode') -> str:
         I = self.exp.hwif.get_input_identifier(field)
         Iq = self.exp.field_logic.get_next_q_identifier(field)
-        return f"{Iq} /= {I}"
+        return f"or_reduce({Iq} xor {I})"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         I = self.exp.hwif.get_input_identifier(field)

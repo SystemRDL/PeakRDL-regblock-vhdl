@@ -32,9 +32,19 @@ module regblock_adapter_sv
         .clk(clk),
         .{{default_resetsignal_name}}({{default_resetsignal_name}}),
 
-        {%- for cpuif_sig, _ in cpuif_signals %}
-        .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }}),
+        {%- for signal in ds.out_of_hier_signals.values() %}
+        .{{kwf(signal.inst_name)}}({{kwf(signal.inst_name)}}),
         {%- endfor %}
+
+        {%- if ds.has_paritycheck %}
+        .parity_error(parity_error),
+        {%- endif %}
+
+        {%- for cpuif_sig, _, _ in cpuif_signals %}
+        .{{ escape(sv_cpuif.signal(cpuif_sig)) }}({{ sv_cpuif.signal(cpuif_sig) }})
+        {%- if not loop.last %},{% endif -%}
+        {%- endfor %}
+        {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 
         {%- for hwif_sig, _ in hwif_signals %}
         .{{ escape(hwif_sig) }}({{ hwif_sig }})

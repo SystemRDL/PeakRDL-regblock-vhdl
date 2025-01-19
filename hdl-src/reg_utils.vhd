@@ -34,6 +34,10 @@ package reg_utils is
   function to_std_logic(vec: in std_logic_vector(0 downto 0)) return std_logic;
   function to_std_logic(uns: in unsigned(0 downto 0)) return std_logic;
 
+  -- reduction OR for tools with poor VHDL 2008 support
+  function or_reduce(vec: in std_logic_vector) return std_logic;
+  function or_reduce(logic: in std_logic) return std_logic;
+
 end package reg_utils;
 
 package body reg_utils is
@@ -94,6 +98,21 @@ package body reg_utils is
     function to_std_logic(uns: in unsigned(0 downto 0)) return std_logic is
     begin
         return uns(0);
+    end function;
+
+    function or_reduce(vec: in std_logic_vector) return std_logic is
+        variable result: std_logic;
+    begin
+        result := '0';
+        for i in vec'RANGE loop
+            result := result or vec(i);
+        end loop;
+        return result;
+    end function;
+
+    function or_reduce(logic: in std_logic) return std_logic is
+    begin
+        return logic;
     end function;
 
 end package body;

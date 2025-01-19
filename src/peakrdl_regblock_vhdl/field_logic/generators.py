@@ -9,7 +9,7 @@ from ..struct_generator import RDLFlatStructGenerator
 from ..forloop_generator import RDLForLoopGenerator
 from ..utils import get_indexed_path
 from ..identifier_filter import kw_filter as kwf
-from ..vhdl_int import VhdlInt
+from ..vhdl_int import VhdlInt, zero_pad
 
 
 if TYPE_CHECKING:
@@ -277,6 +277,7 @@ class FieldLogicGenerator(RDLForLoopGenerator):
             'get_value': self.exp.dereferencer.get_value,
             'get_resetsignal': self.exp.dereferencer.get_resetsignal,
             'get_input_identifier': self.exp.hwif.get_input_identifier,
+            'zero_pad': zero_pad,
             'ds': self.ds,
         }
         self.add_content(self.field_storage_template.render(context))
@@ -395,7 +396,7 @@ class FieldLogicGenerator(RDLForLoopGenerator):
     def assign_external_block_outputs(self, node: 'AddressableNode') -> None:
         prefix = "hwif_out." + get_indexed_path(self.exp.ds.top_node, node)
         strb = self.exp.dereferencer.get_external_block_access_strobe(node)
-        addr_width = node.size.bit_length()
+        addr_width = (node.size - 1).bit_length()
 
         retime = False
         if isinstance(node, RegfileNode):

@@ -107,14 +107,14 @@ class BaseTestCase(unittest.TestCase):
         root = rdlc.elaborate(self.rdl_elab_target, "regblock", self.rdl_elab_params)
 
         for lang, exporter, cpuif_cls in (
-            ("sv", self.sv_exporter, self.cpuif.sv_cpuif_cls),
-            ("vhdl", self.vhdl_exporter, self.cpuif.vhdl_cpuif_cls),
+            ("", self.sv_exporter, self.cpuif.sv_cpuif_cls),
+            ("vhdl_", self.vhdl_exporter, self.cpuif.vhdl_cpuif_cls),
         ):
             exporter.export(
                 root,
                 self.get_run_dir(),
-                module_name=lang+"_regblock",
-                package_name=lang+"_regblock_pkg",
+                module_name=lang+"regblock",
+                package_name=lang+"regblock_pkg",
                 cpuif_cls=cpuif_cls,
                 retime_read_fanin=self.retime_read_fanin,
                 retime_read_response=self.retime_read_response,
