@@ -2,15 +2,26 @@ from typing import TYPE_CHECKING
 
 from systemrdl.node import FieldNode, RegNode
 
-from ..struct_generator import RDLStructGenerator
+from ..struct_generator import RDLFlatStructGenerator
+from ..identifier_filter import kw_filter as kwf
 
 if TYPE_CHECKING:
     from . import WriteBuffering
+    from systemrdl.node import Node
 
-class WBufStorageStructGenerator(RDLStructGenerator):
+class WBufStorageStructGenerator(RDLFlatStructGenerator):
     def __init__(self, wbuf: 'WriteBuffering') -> None:
         super().__init__()
         self.wbuf = wbuf
+
+    def get_typdef_name(self, node:'Node', suffix: str = "") -> str:
+        base = node.get_rel_path(
+            self.wbuf.top_node.parent,
+            hier_separator=".",
+            array_suffix="",
+            empty_array_suffix=""
+        )
+        return kwf(f'{base}{suffix}_wbuf_storage_t')
 
     def enter_Field(self, node: FieldNode) -> None:
         # suppress parent class's field behavior

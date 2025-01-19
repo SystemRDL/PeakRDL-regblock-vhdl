@@ -24,7 +24,7 @@ class WriteBuffering:
         struct_gen = WBufStorageStructGenerator(self)
         s = struct_gen.get_struct(self.top_node, "wbuf_storage_t")
         assert s is not None
-        return s + "\nwbuf_storage_t wbuf_storage;"
+        return s + "\nsignal wbuf_storage : wbuf_storage_t;"
 
 
     def get_implementation(self) -> str:
@@ -41,7 +41,7 @@ class WriteBuffering:
 
     def get_write_strobe(self, node: Union[RegNode, FieldNode]) -> str:
         prefix = self.get_wbuf_prefix(node)
-        return f"{prefix}.pending && {self.get_trigger(node)}"
+        return f"{prefix}.pending and {self.get_trigger(node)}"
 
     def get_raw_trigger(self, node: 'RegNode') -> Union[VhdlInt, str]:
         trigger = node.get_property('wbuffer_trigger')
@@ -55,15 +55,15 @@ class WriteBuffering:
 
             if accesswidth < regwidth:
                 n_subwords = regwidth // accesswidth
-                return f"{strb_prefix}[{n_subwords-1}] && decoded_req_is_wr"
+                return f"{strb_prefix}({n_subwords-1}) and decoded_req_is_wr"
             else:
-                return f"{strb_prefix} && decoded_req_is_wr"
+                return f"{strb_prefix} and decoded_req_is_wr"
         elif isinstance(trigger, SignalNode):
             s = self.exp.dereferencer.get_value(trigger)
             if trigger.get_property('activehigh'):
                 return s
             else:
-                return f"~{s}"
+                return f"not {s}"
         else:
             # Trigger is a field or propref bit
             return self.exp.dereferencer.get_value(trigger)
