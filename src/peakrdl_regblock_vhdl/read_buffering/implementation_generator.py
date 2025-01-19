@@ -4,7 +4,6 @@ from systemrdl.component import Reg
 from systemrdl.node import RegNode
 
 from ..forloop_generator import RDLForLoopGenerator
-from ..vhdl_int import VhdlInt
 
 if TYPE_CHECKING:
     from . import ReadBuffering
