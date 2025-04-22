@@ -4,6 +4,7 @@ from ..base import CpuifBase
 
 class APB4_Cpuif(CpuifBase):
     template_path = "apb4_tmpl.vhd"
+    is_interface = True
 
     @property
     def package_name(self) -> Union[str, None]:
@@ -34,6 +35,8 @@ class APB4_Cpuif(CpuifBase):
 
 
 class APB4_Cpuif_flattened(APB4_Cpuif):
+    is_interface = False
+
     @property
     def package_name(self) -> Union[str, None]:
         return None

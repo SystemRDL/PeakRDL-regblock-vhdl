@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, List
+from typing import TYPE_CHECKING, Optional, List, Union
 
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
 from systemrdl.rdltypes import PropertyReference
@@ -19,6 +19,7 @@ class DesignValidator(RDLListener):
     """
     def __init__(self, exp:'RegblockExporter') -> None:
         self.exp = exp
+        self.ds = exp.ds
         self.msg = self.top_node.env.msg
 
         self._contains_external_block_stack = [] # type: List[bool]
@@ -76,7 +77,7 @@ class DesignValidator(RDLListener):
                 f"instance '{node.inst_name}' must be a multiple of {alignment}",
                 node.inst.inst_src_ref
             )
-        if node.is_array and (node.array_stride % alignment) != 0:
+        if node.is_array and (node.array_stride % alignment) != 0: # type: ignore # is_array implies stride is not none
             self.msg.error(
                 "Unaligned registers are not supported. Address stride of "
                 f"instance array '{node.inst_name}' must be a multiple of {alignment}",
@@ -97,7 +98,7 @@ class DesignValidator(RDLListener):
     def enter_Addrmap(self, node: AddrmapNode) -> None:
         self._check_sharedextbus(node)
 
-    def _check_sharedextbus(self, node: Node) -> None:
+    def _check_sharedextbus(self, node: Union[RegfileNode, AddrmapNode]) -> None:
         if node.get_property('sharedextbus'):
             self.msg.error(
                 "This exporter does not support enabling the 'sharedextbus' property yet.",
@@ -114,7 +115,7 @@ class DesignValidator(RDLListener):
             if accesswidth != self.exp.cpuif.data_width:
                 self.msg.error(
                     f"Multi-word registers that have an accesswidth ({accesswidth}) "
-                    "that is inconsistent with this regblock's CPU bus width "
+                    "that are inconsistent with this regblock's CPU bus width "
                     f"({self.exp.cpuif.data_width}) are not supported.",
                     node.inst.inst_src_ref
                 )
@@ -128,15 +129,6 @@ class DesignValidator(RDLListener):
             and (node.lsb // parent_accesswidth) != (node.msb // parent_accesswidth)
         ):
             # field spans multiple sub-words
-            if node.external:
-                # External fields that span multiple subwords is not supported
-                self.msg.error(
-                    "External fields that span multiple software-accessible "
-                    "subwords are not supported.",
-                    node.inst.inst_src_ref
-                )
-                # Skip remaining validation rules for external fields
-                return
 
             if node.is_sw_writable and not node.parent.get_property('buffer_writes'):
                 # ... and is writable without the protection of double-buffering
@@ -160,6 +152,23 @@ class DesignValidator(RDLListener):
                     "For more details, see: https://peakrdl-regblock.readthedocs.io/en/latest/udps/read_buffering.html",
                     node.inst.inst_src_ref
                 )
+
+        # Check for unsynthesizable reset
+        reset = node.get_property("reset")
+        if not (reset is None or isinstance(reset, int)):
+            # Has reset that is not a constant value
+            resetsignal = node.get_property("resetsignal")
+            if resetsignal:
+                is_async_reset = resetsignal.get_property("async")
+            else:
+                is_async_reset = self.ds.default_reset_async
+
+            if is_async_reset:
+                self.msg.error(
+                    "A field that uses an asynchronous reset cannot use a dynamic reset value. This is not synthesizable.",
+                    node.inst.inst_src_ref
+                )
+
 
     def exit_AddressableComponent(self, node: AddressableNode) -> None:
         if not isinstance(node, RegNode):
@@ -189,6 +198,7 @@ class DesignValidator(RDLListener):
                         node.inst.inst_src_ref
                     )
                 if node.is_array:
+                    assert node.array_stride is not None
                     if not is_pow2(node.array_stride):
                         self.msg.error(
                             f"Address stride of instance array '{node.inst_name}' is not a power of 2"

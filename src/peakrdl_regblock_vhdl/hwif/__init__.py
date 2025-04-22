@@ -33,12 +33,12 @@ class Hwif:
 
         self.hwif_report_file = hwif_report_file
 
-        if self.ds.reuse_hwif_typedefs:
-            self._gen_in_cls = InputStructGenerator_TypeScope
-            self._gen_out_cls = OutputStructGenerator_TypeScope
-        else:
+        if not self.ds.reuse_hwif_typedefs:
             self._gen_in_cls = InputStructGenerator_Hier
             self._gen_out_cls = OutputStructGenerator_Hier
+        else:
+            self._gen_in_cls = InputStructGenerator_TypeScope
+            self._gen_out_cls = OutputStructGenerator_TypeScope
 
     @property
     def ds(self) -> 'DesignState':
@@ -47,6 +47,23 @@ class Hwif:
     @property
     def top_node(self) -> AddrmapNode:
         return self.exp.ds.top_node
+
+
+    def get_extra_package_params(self) -> str:
+        lines = []
+
+        for param in self.top_node.inst.parameters:
+            value = param.get_value()
+            if isinstance(value, int):
+                lines.append(
+                    f"constant {param.name} : integer := {value};"
+                )
+            elif isinstance(value, str):
+                lines.append(
+                    f"constant {param.name} : string := {value};"
+                )
+
+        return "\n".join(lines)
 
 
     def get_package_contents(self) -> str:
@@ -158,6 +175,7 @@ class Hwif:
             path = get_indexed_path(self.top_node, obj)
             return "hwif_in." + path
         elif isinstance(obj, PropertyReference):
+            assert isinstance(obj.node, FieldNode)
             return self.get_implied_prop_input_identifier(obj.node, obj.name)
 
         raise RuntimeError(f"Unhandled reference to: {obj}")
@@ -210,6 +228,7 @@ class Hwif:
             # not sure when anything would call this function with a prop ref
             # when dereferencer's get_value is more useful here
             assert obj.node.get_property(obj.name)
+            assert isinstance(obj.node, (RegNode, FieldNode))
             return self.get_implied_prop_output_identifier(obj.node, obj.name)
 
         raise RuntimeError(f"Unhandled reference to: {obj}")

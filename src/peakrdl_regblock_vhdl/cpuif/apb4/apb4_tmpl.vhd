@@ -1,3 +1,17 @@
+{%- if cpuif.is_interface -%}
+-- pragma translate_off
+cpuif_generics: process begin
+    assert {{cpuif.signal("paddr")}}'length >= {{ds.module_name.upper()}}_MIN_ADDR_WIDTH
+        report "Interface address width of " & integer'image({{cpuif.signal("paddr")}}'length) & " is too small. Shall be at least " & integer'image({{ds.module_name.upper()}}_MIN_ADDR_WIDTH) & " bits"
+        severity failure;
+    assert {{cpuif.signal("pwdata")}}'length = {{ds.module_name.upper()}}_DATA_WIDTH
+        report "Interface data width of " & integer'image({{cpuif.signal("pwdata")}}'length) & " is incorrect. Shall be " & integer'image({{ds.module_name.upper()}}_DATA_WIDTH) & " bits"
+        severity failure;
+    wait;
+end process;
+-- pragma translate_on
+{% endif %}
+
 -- Request
 {%- macro apb4_reset() %}
     apb_is_active <= '0';

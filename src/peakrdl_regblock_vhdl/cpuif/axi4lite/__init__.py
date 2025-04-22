@@ -5,6 +5,7 @@ from ...utils import clog2, roundup_pow2
 
 class AXI4Lite_Cpuif(CpuifBase):
     template_path = "axi4lite_tmpl.vhd"
+    is_interface = True
 
     @property
     def port_declaration(self) -> str:
@@ -91,6 +92,8 @@ class AXI4Lite_Cpuif(CpuifBase):
 
 
 class AXI4Lite_Cpuif_flattened(AXI4Lite_Cpuif):
+    is_interface = False
+
     @property
     def package_name(self) -> Union[str, None]:
         return None

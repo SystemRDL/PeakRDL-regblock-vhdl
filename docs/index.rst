@@ -1,44 +1,25 @@
 Introduction
 ============
 
-PeakRDL-regblock is a free and open-source control & status register (CSR) compiler.
+PeakRDL-regblock-vhdl is a free and open-source control & status register (CSR) compiler.
 This code generator translates your SystemRDL register description into
-a synthesizable SystemVerilog RTL module that can be easily instantiated into
+a synthesizable VHDL RTL module that can be easily instantiated into
 your hardware design.
 
-* Generates fully synthesizable SystemVerilog RTL (IEEE 1800-2012)
+* Generates fully synthesizable VHDL RTL (IEEE 1076-2008)
 * Options for many popular CPU interface protocols (AMBA APB, AXI4-Lite, and more)
 * Configurable pipelining options for designs with fast clock rates.
 * Broad support for SystemRDL 2.0 features
-* Fully synthesizable SystemVerilog. Tested on Xilinx/AMD's Vivado & Intel Quartus
-
-.. warning::
-
-    The PeakRDL-regblock SV generator is still in pre-production (v0.x version numbers).
-    During this time, I may decide to refactor things which could affect compatibility.
 
 
-Installing
-----------
-
-Install from `PyPi`_ using pip
+Quick Start
+-----------
+The easiest way to use PeakRDL-regblock-vhdl is via the  `PeakRDL command line tool <https://peakrdl.readthedocs.io/>`_:
 
 .. code-block:: bash
 
-    python3 -m pip install peakrdl-regblock
-
-.. _PyPi: https://pypi.org/project/peakrdl-regblock
-
-
-
-Example
--------
-The easiest way to use PeakRDL-regblock is via the  `PeakRDL command line tool <https://peakrdl.readthedocs.io/>`_:
-
-.. code-block:: bash
-
-    # Install the command line tool
-    python3 -m pip install peakrdl
+    # Install PeakRDL-regblock-vhdl along with the command-line tool
+    python3 -m pip install peakrdl-regblock-vhdl[cli]
 
     # Export!
     peakrdl regblock atxmega_spi.rdl -o regblock/ --cpuif axi4-lite
@@ -62,6 +43,7 @@ Links
     hwif
     configuring
     limitations
+    faq
     licensing
     api
 

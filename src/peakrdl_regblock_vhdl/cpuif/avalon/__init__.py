@@ -4,6 +4,7 @@ from ...utils import clog2
 
 class Avalon_Cpuif(CpuifBase):
     template_path = "avalon_tmpl.vhd"
+    is_interface = True
 
     @property
     def package_name(self) -> Union[str, None]:
@@ -38,6 +39,8 @@ class Avalon_Cpuif(CpuifBase):
         return self.addr_width - clog2(self.data_width_bytes)
 
 class Avalon_Cpuif_flattened(Avalon_Cpuif):
+    is_interface = False
+
     @property
     def port_declaration(self) -> str:
         lines = [

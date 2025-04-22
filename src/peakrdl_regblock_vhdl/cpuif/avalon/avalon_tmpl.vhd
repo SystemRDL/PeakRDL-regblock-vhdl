@@ -1,3 +1,17 @@
+{%- if cpuif.is_interface -%}
+-- pragma translate_off
+cpuif_generics: process begin
+    assert {{cpuif.signal("address")}}'length >= {{cpuif.word_addr_width}}
+        report "Interface address width of " & integer'image({{cpuif.signal("address")}}'length) & " is too small. Shall be at least " & integer'image({{cpuif.word_addr_width}}) & " bits"
+        severity failure;
+    assert {{cpuif.signal("writedata")}}'length = {{ds.module_name.upper()}}_DATA_WIDTH
+        report "Interface data width of " & integer'image({{cpuif.signal("writedata")}}'length) & " is incorrect. Shall be " & integer'image({{ds.module_name.upper()}}_DATA_WIDTH) & " bits"
+        severity failure;
+    wait;
+end process;
+-- pragma translate_on
+{% endif %}
+
 -- Request
 process(all) begin
     cpuif_req <= {{cpuif.signal("read")}} or {{cpuif.signal("write")}};
