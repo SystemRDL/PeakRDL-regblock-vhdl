@@ -66,24 +66,32 @@ process({{get_always_ff_event(resetsignal)}}) begin
         {%- if node.get_property('paritycheck') %}
         {{field_logic.get_parity_identifier(node)}} <= {% if node.width != 1 %}xor std_logic_vector'{% endif %}({{reset}});
         {%- endif %}
+        {%- if field_logic.has_next_q(node) %}
+        {{field_logic.get_next_q_identifier(node)}} <= {{reset}};
+        {%- endif %}
     {%- endmacro %}
     if {{get_resetsignal(resetsignal, asynch=True)}} then -- async reset
         {{- field_reset() }}
     elsif rising_edge(clk) then
         if {{get_resetsignal(resetsignal, asynch=False)}} then -- sync reset
             {{- field_reset() | indent }}
-        elsif {{field_logic.get_field_combo_identifier(node, "load_next")}} then
-            {{- field_set() | indent(8) }}
+        else
+            if {{field_logic.get_field_combo_identifier(node, "load_next")}} then
+                {{- field_set() | indent(12) }}
+            end if;
+            {%- if field_logic.has_next_q(node) %}
+            {{field_logic.get_next_q_identifier(node)}} <= {{get_input_identifier(node)}};
+            {%- endif %}
         end if;
+    end if;
     {%- else %}
     if rising_edge(clk) then
         if {{field_logic.get_field_combo_identifier(node, "load_next")}} then
             {{- field_set() | indent(8) }}
         end if;
-    {%- endif %}
-
         {%- if field_logic.has_next_q(node) %}
         {{field_logic.get_next_q_identifier(node)}} <= {{get_input_identifier(node)}};
         {%- endif %}
     end if;
+    {%- endif %}
 end process;

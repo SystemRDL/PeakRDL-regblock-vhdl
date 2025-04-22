@@ -27,10 +27,6 @@ std_logic_vector
     {{field_logic.get_field_combo_identifier(node, "incrthreshold")}} <= to_std_logic(unsigned({{field_logic.get_storage_identifier(node)}}) >= to_unsigned({{field_logic.get_counter_incrthreshold_value(node)}}));
     {%- if field_logic.counter_incrsaturates(node) %}
     {{field_logic.get_field_combo_identifier(node, "incrsaturate")}} <= to_std_logic(unsigned({{field_logic.get_storage_identifier(node)}}) >= to_unsigned({{field_logic.get_counter_incrsaturate_value(node)}}));
-    if to_unsigned(next_c) > to_unsigned({{field_logic.get_counter_incrsaturate_value(node)}}) then
-        next_c := {{field_logic.get_counter_incrsaturate_value(node)}};
-        load_next_c := '1';
-    end if;
     {%- endif %}
 {%- endmacro %}
 
@@ -56,9 +52,5 @@ std_logic_vector
     {{field_logic.get_field_combo_identifier(node, "decrthreshold")}} <= to_std_logic(unsigned({{field_logic.get_storage_identifier(node)}}) <= to_unsigned({{field_logic.get_counter_decrthreshold_value(node)}}));
     {%- if field_logic.counter_decrsaturates(node) %}
     {{field_logic.get_field_combo_identifier(node, "decrsaturate")}} <= to_std_logic(unsigned({{field_logic.get_storage_identifier(node)}}) <= to_unsigned({{field_logic.get_counter_decrsaturate_value(node)}}));
-    if to_unsigned(next_c) < to_unsigned({{field_logic.get_counter_decrsaturate_value(node)}}) then
-        next_c := {{field_logic.get_counter_decrsaturate_value(node)}};
-        load_next_c := '1';
-    end if;
     {%- endif %}
 {%- endmacro %}

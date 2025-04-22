@@ -58,7 +58,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
         offset_parts = []
         offset_parts.append(str(self.current_offset))
         for i in range(self._loop_level):
-            offset_parts.append(f"i{i}*$i{i}sz")
+            offset_parts.append(f"i{i} * $i{i}sz")
         return " + ".join(offset_parts)
 
     def push_loop(self, dim: int, label: Union[str, None] = None) -> None:

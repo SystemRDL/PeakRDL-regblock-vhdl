@@ -5,6 +5,7 @@ from systemrdl.walker import WalkerAction
 
 from ..struct_generator import RDLFlatStructGenerator
 from ..identifier_filter import kw_filter as kwf
+from ..utils import clog2
 
 if TYPE_CHECKING:
     from systemrdl.node import Node, SignalNode, AddressableNode, RegfileNode
@@ -71,13 +72,13 @@ class InputStructGenerator_Hier(HWIFStructGenerator):
         self.add_member("rd_data", self.hwif.ds.cpuif_data_width)
         self.add_member("wr_ack")
 
-    def enter_Addrmap(self, node: 'AddrmapNode') -> None:
+    def enter_Addrmap(self, node: 'AddrmapNode') -> Optional[WalkerAction]:
         super().enter_Addrmap(node)
         assert node.external
         self._add_external_block_members(node)
         return WalkerAction.SkipDescendants
 
-    def enter_Regfile(self, node: 'RegfileNode') -> None:
+    def enter_Regfile(self, node: 'RegfileNode') -> Optional[WalkerAction]:
         super().enter_Regfile(node)
         if node.external:
             self._add_external_block_members(node)
@@ -161,18 +162,18 @@ class OutputStructGenerator_Hier(HWIFStructGenerator):
 
     def _add_external_block_members(self, node: 'AddressableNode') -> None:
         self.add_member("req")
-        self.add_member("addr", (node.size - 1).bit_length())
+        self.add_member("addr", clog2(node.size))
         self.add_member("req_is_wr")
         self.add_member("wr_data", self.hwif.ds.cpuif_data_width)
         self.add_member("wr_biten", self.hwif.ds.cpuif_data_width)
 
-    def enter_Addrmap(self, node: 'AddrmapNode') -> None:
+    def enter_Addrmap(self, node: 'AddrmapNode') -> Optional[WalkerAction]:
         super().enter_Addrmap(node)
         assert node.external
         self._add_external_block_members(node)
         return WalkerAction.SkipDescendants
 
-    def enter_Regfile(self, node: 'RegfileNode') -> None:
+    def enter_Regfile(self, node: 'RegfileNode') -> Optional[WalkerAction]:
         super().enter_Regfile(node)
         if node.external:
             self._add_external_block_members(node)

@@ -31,7 +31,7 @@ class Questa(Simulator):
             # Ignore noisy warning about vopt-time checking of always_comb/always_latch
             "-suppress", "2583",
 
-            # Ignore warning line number differences due to `line directive
+            # Suppress "error" about use of the `line directive
             "-suppress", "13465",
         ]
 
