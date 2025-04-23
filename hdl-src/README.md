@@ -1,5 +1,5 @@
 # HDL Source Files
-This folder contains some SystemVerilog definitions that are useful collateral
+This folder contains some VHDL definitions that are useful collateral
 to be used alongside this project.
 
 These reference files are free to use for any purpose and are not covered by

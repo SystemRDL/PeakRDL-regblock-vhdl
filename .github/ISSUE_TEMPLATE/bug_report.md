@@ -7,7 +7,8 @@ assignees: ''
 
 ---
 
-- [ ] I have reviewed this project's [contribution guidelines](https://github.com/SystemRDL/PeakRDL-regblock/blob/main/CONTRIBUTING.md)
+- [ ] I have verified this bug has not already been reported on the [upstream issue tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues)
+- [ ] I have reviewed this project's [contribution guidelines](https://github.com/SystemRDL/PeakRDL-regblock-vhdl/blob/main/CONTRIBUTING.md)
 
 **Describe the bug**
 A clear and concise description of what the bug is.

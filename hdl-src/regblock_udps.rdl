@@ -1,6 +1,6 @@
 /*
  * This file defines several property extensions that are understood by the
- * PeakRDL-Regblock SystemVerilog code generator.
+ * PeakRDL-Regblock-vhdl code generator.
  *
  * Compile this file prior to your other SystemRDL sources.
  *

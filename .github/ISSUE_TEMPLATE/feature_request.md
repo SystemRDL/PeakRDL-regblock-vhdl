@@ -7,7 +7,8 @@ assignees: ''
 
 ---
 
-- [ ] I have reviewed this project's [contribution guidelines](https://github.com/SystemRDL/PeakRDL-regblock/blob/main/CONTRIBUTING.md)
+- [ ] I have verified this feature is unique to VHDL and not applicable to the upstream SystemVerilog repository (if not, please submit the feature request on the [upstream issue tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues) instead).
+- [ ] I have reviewed this project's [contribution guidelines](https://github.com/SystemRDL/PeakRDL-regblock-vhdl/blob/main/CONTRIBUTING.md)
 
 **Describe the problem/limitation you think should be addressed**
 A clear and concise description of what the problem is.
