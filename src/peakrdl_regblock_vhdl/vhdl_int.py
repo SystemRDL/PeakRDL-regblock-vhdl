@@ -128,12 +128,14 @@ class VhdlInt:
         return cls(value, width=width, kind=VhdlIntType.BIT_STRING_UNSIGNED, allow_std_logic=allow_std_logic)
 
 
-def zero_pad(identifier: VhdlInt | str, num=1) -> VhdlInt | str:
+def zero_pad(identifier: VhdlInt | str, num: int=1) -> VhdlInt | str:
     """Pad `num` zeros on the left (unsigned sign extension)
 
     If str, assume it is a VHDL identifier.
     """
     if isinstance(identifier, VhdlInt):
+        if identifier.width is None:
+            raise ValueError(f"VhdlInt identifier {identifier} has no known width")
         return identifier.resize(identifier.width + num)
     else:
         return f'"{"0"*num}" & {identifier}'

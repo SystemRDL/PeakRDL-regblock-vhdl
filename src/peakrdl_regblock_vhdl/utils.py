@@ -72,7 +72,7 @@ def ref_is_internal(top_node: AddrmapNode, ref: Union[Node, PropertyReference]) 
     return True
 
 
-def do_slice(value: Union[VhdlInt, str], high: int, low: int, reduce=True) -> Union[VhdlInt, str]:
+def do_slice(value: Union[VhdlInt, str], high: int, low: int, reduce: bool=True) -> Union[VhdlInt, str]:
     if isinstance(value, str):
         # If string, assume this is an identifier. Append bit-slice
         if high == low and reduce:

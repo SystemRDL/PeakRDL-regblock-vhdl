@@ -32,7 +32,7 @@ class HWSet(NextStateConditional):
             E = self.exp.dereferencer.get_value(hwenable)
             next_val = f"{R} or {E}"
         else:
-            next_val = VhdlInt.ones(field.width)
+            next_val = str(VhdlInt.ones(field.width))
 
         return [
             f"next_c := {next_val};",
@@ -65,7 +65,7 @@ class HWClear(NextStateConditional):
             E = self.exp.dereferencer.get_value(hwenable)
             next_val = f"{R} and not {E}"
         else:
-            next_val = VhdlInt.zeros(field.width)
+            next_val = str(VhdlInt.zeros(field.width))
 
         return [
             f"next_c := {next_val};",
