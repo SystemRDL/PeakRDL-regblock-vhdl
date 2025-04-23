@@ -10,8 +10,8 @@ import pytest
 from systemrdl import RDLCompiler
 
 from peakrdl_regblock_vhdl import RegblockExporter as VhdlRegblockExporter
+from peakrdl_regblock_vhdl.udps import ALL_UDPS
 from peakrdl_regblock import RegblockExporter as SvRegblockExporter
-from peakrdl_regblock.udps import ALL_UDPS
 
 from .vhdl_adapter import VhdlAdapter
 from .cpuifs.base import CpuifTestMode

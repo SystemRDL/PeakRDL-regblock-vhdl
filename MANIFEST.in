@@ -1,2 +1,2 @@
-recursive-include src/peakrdl_regblock *.vhd
+recursive-include src/peakrdl_regblock_vhdl *.vhd
 prune tests

@@ -56,7 +56,7 @@ jobs:
       - name: Test
         run: |
           cd tests
-          pytest --cov=peakrdl_regblock --synth-tool skip --sim-tool stub
+          pytest --cov=peakrdl_regblock_vhdl --synth-tool skip --sim-tool stub
 
       - name: Coveralls
         env:
@@ -103,7 +103,7 @@ jobs:
 
       - name: Run Lint
         run: |
-          pylint --rcfile tests/pylint.rc peakrdl_regblock
+          pylint --rcfile tests/pylint.rc peakrdl_regblock_vhdl
 
 #-------------------------------------------------------------------------------
   mypy:
@@ -125,7 +125,7 @@ jobs:
 
       - name: Type Check
         run: |
-          mypy --config-file tests/mypy.ini src/peakrdl_regblock
+          mypy --config-file tests/mypy.ini src/peakrdl_regblock_vhdl
 
 #-------------------------------------------------------------------------------
   build:
