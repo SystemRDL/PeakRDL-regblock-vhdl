@@ -64,6 +64,7 @@ class VhdlInt:
                     return "(others => '1')"
                 else:
                     raise ValueError(f"AGGREGATE type VhdlInt only supports all zeros or all ones (got {self.value}, width {self.width})")
+        raise ValueError(f"Unsupported VhdlInt kind: {self.kind}")
 
     def resize(self, new_width: int) -> Self:
         """Change the width of the VhdlInt"""

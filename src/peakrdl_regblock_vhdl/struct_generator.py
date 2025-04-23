@@ -33,14 +33,14 @@ class _AnonymousStruct(_StructBase):
             return (
             f"{self.inst_name} is record\n"
             + super().__str__()
-            + f"\nend record;\n"
+            + "\nend record;\n"
             + f"{kwf(self.inst_name + "_array")} is array{suffix} of {self.inst_name};"
             )
         else:
             return (
             f"{self.inst_name} is record\n"
             + super().__str__()
-            + f"\nend record;\n"
+            + "\nend record;\n"
             )
 
 
@@ -59,14 +59,14 @@ class _TypedefStruct(_StructBase):
             return (
                 f"type {self.type_name} is record\n"
                 + super().__str__()
-                + f"\nend record;\n"
+                + "\nend record;\n"
                 + f"type {type_name} is array{suffix} of {self.type_name};"
             )
         else:
             return (
                 f"type {self.type_name} is record\n"
                 + super().__str__()
-                + f"\nend record;"
+                + "\nend record;"
             )
 
     @property
