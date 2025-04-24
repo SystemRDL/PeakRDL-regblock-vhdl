@@ -34,7 +34,7 @@ class _AnonymousStruct(_StructBase):
             f"{self.inst_name} is record\n"
             + super().__str__()
             + "\nend record;\n"
-            + f"{kwf(self.inst_name + "_array")} is array{suffix} of {self.inst_name};"
+            + f"{kwf(self.inst_name + '_array')} is array{suffix} of {self.inst_name};"
             )
         else:
             return (
