@@ -118,6 +118,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -r tests/requirements.txt
+          mypy --install-types --non-interactive
 
       - name: Install
         run: |
