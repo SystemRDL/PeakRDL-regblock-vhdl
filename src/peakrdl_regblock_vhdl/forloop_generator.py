@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, List, Union
+from typing import TYPE_CHECKING, Optional, List, Type, Union
 import textwrap
 
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
@@ -40,7 +40,7 @@ class LoopBody(Body):
 
 class ForLoopGenerator:
     loop_type = "loop"
-    loop_body_cls: "type[LoopBody]" = LoopBody
+    loop_body_cls = LoopBody # type: Type[LoopBody]
 
     def __init__(self) -> None:
         self._loop_level = 0
