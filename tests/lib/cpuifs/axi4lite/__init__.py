@@ -20,7 +20,7 @@ class AXI4Lite(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, bool, int]]:
+    def input_signals(cpuif: SvAXI4Lite_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("awvalid", False, 1),
@@ -37,7 +37,7 @@ class AXI4Lite(CpuifTestMode):
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvAXI4Lite_Cpuif) -> list[tuple[str, bool, int]]:
+    def output_signals(cpuif: SvAXI4Lite_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("awready", False, 1),

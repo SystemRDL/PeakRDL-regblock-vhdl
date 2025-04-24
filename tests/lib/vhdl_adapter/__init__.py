@@ -89,7 +89,7 @@ class SvInputStructSignals(InputStructGenerator_Hier):
     """Monitor signals added via "add_member" to produce a list of HWIF
     input signals and their widths
     """
-    def get_signals(self, node: 'Node') -> list[tuple[str, int]]:
+    def get_signals(self, node: 'Node') -> "list[tuple[str, int]]":
         self.signals = set()
         self.start("don't care")
 
@@ -127,7 +127,7 @@ class SvOutputStructSignals(OutputStructGenerator_Hier):
     """Monitor signals added via "add_member" to produce a list of HWIF
     output signals and their widths
     """
-    def get_signals(self, node: 'Node') -> list[tuple[str, int]]:
+    def get_signals(self, node: 'Node') -> "list[tuple[str, int]]":
         self.signals = set()
         self.start("don't care")
 

@@ -29,15 +29,15 @@ class CpuifTestMode:
     tb_template = ""
 
     @staticmethod
-    def input_signals(cpuif: SvCpuifBase) -> list[tuple[str, int]]:
+    def input_signals(cpuif: SvCpuifBase) -> "list[tuple[str, int]]":
         raise NotImplementedError()
 
     @staticmethod
-    def output_signals(cpuif: SvCpuifBase) -> list[tuple[str, int]]:
+    def output_signals(cpuif: SvCpuifBase) -> "list[tuple[str, int]]":
         raise NotImplementedError()
 
     @classmethod
-    def signals(cls, cpuif: SvCpuifBase) -> list[tuple[str, int]]:
+    def signals(cls, cpuif: SvCpuifBase) -> "list[tuple[str, int]]":
         results = cls.input_signals(cpuif)
         results.extend(cls.output_signals(cpuif))
         return results

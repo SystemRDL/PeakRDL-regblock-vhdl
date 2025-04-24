@@ -20,7 +20,7 @@ class Avalon(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvAvalon_Cpuif) -> list[tuple[str, bool, int]]:
+    def input_signals(cpuif: SvAvalon_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("read",       False, 1),
@@ -31,7 +31,7 @@ class Avalon(CpuifTestMode):
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvAvalon_Cpuif) -> list[tuple[str, bool, int]]:
+    def output_signals(cpuif: SvAvalon_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("waitrequest",        False, 1),

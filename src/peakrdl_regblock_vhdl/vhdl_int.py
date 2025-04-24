@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional, Self
+from typing import Optional, Union
 from enum import Enum
 
 
@@ -66,7 +66,7 @@ class VhdlInt:
                     raise ValueError(f"AGGREGATE type VhdlInt only supports all zeros or all ones (got {self.value}, width {self.width})")
         raise ValueError(f"Unsupported VhdlInt kind: {self.kind}")
 
-    def resize(self, new_width: int) -> Self:
+    def resize(self, new_width: int) -> "VhdlInt":
         """Change the width of the VhdlInt"""
         new = deepcopy(self)
         new.width = new_width
@@ -87,7 +87,7 @@ class VhdlInt:
         return new
 
     @classmethod
-    def ones(cls, width: Optional[int] = None, allow_std_logic: bool = True) -> Self:
+    def ones(cls, width: Optional[int] = None, allow_std_logic: bool = True) -> "VhdlInt":
         """All ones aggregate "(others => '1')"
 
         May be reduced to '1' if allow_std_logic is True.
@@ -96,7 +96,7 @@ class VhdlInt:
         return cls(value, width, kind=VhdlIntType.AGGREGATE, allow_std_logic=allow_std_logic)
 
     @classmethod
-    def zeros(cls, width: Optional[int] = None, allow_std_logic: bool = True) -> Self:
+    def zeros(cls, width: Optional[int] = None, allow_std_logic: bool = True) -> "VhdlInt":
         """All zeros aggregate "(others => '0')"
 
         May be reduced to '0' if allow_std_logic is True.
@@ -104,31 +104,31 @@ class VhdlInt:
         return cls(0, width, kind=VhdlIntType.AGGREGATE, allow_std_logic=allow_std_logic)
 
     @classmethod
-    def integer(cls, value: int) -> Self:
+    def integer(cls, value: int) -> "VhdlInt":
         """Decimal integer literal, such as "30"
         """
         return cls(value, kind=VhdlIntType.INTEGER)
 
     @classmethod
-    def integer_hex(cls, value: int) -> Self:
+    def integer_hex(cls, value: int) -> "VhdlInt":
         """Hexadecimal integer literal, such as "16#1E#"
         """
         return cls(value, kind=VhdlIntType.INTEGER_HEX)
 
     @classmethod
-    def bit_string(cls, value: int, width: Optional[int] = None, allow_std_logic: bool = True) -> Self:
+    def bit_string(cls, value: int, width: Optional[int] = None, allow_std_logic: bool = True) -> "VhdlInt":
         """Bit string literal, such as 5x"1E"
         """
         return cls(value, width=width, kind=VhdlIntType.BIT_STRING, allow_std_logic=allow_std_logic)
 
     @classmethod
-    def unsigned(cls, value: int, width: Optional[int] = None, allow_std_logic: bool = True) -> Self:
+    def unsigned(cls, value: int, width: Optional[int] = None, allow_std_logic: bool = True) -> "VhdlInt":
         """Unsigned string literal, such as 5Ux"1E"
         """
         return cls(value, width=width, kind=VhdlIntType.BIT_STRING_UNSIGNED, allow_std_logic=allow_std_logic)
 
 
-def zero_pad(identifier: VhdlInt | str, num: int=1) -> VhdlInt | str:
+def zero_pad(identifier: Union[VhdlInt, str], num: int=1) -> Union[VhdlInt, str]:
     """Pad `num` zeros on the left (unsigned sign extension)
 
     If str, assume it is a VHDL identifier.

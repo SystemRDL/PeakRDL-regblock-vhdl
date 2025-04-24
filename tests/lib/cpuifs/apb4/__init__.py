@@ -20,7 +20,7 @@ class APB4(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvAPB4_Cpuif) -> list[tuple[str, bool, int]]:
+    def input_signals(cpuif: SvAPB4_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("psel",    False, 1),
@@ -33,7 +33,7 @@ class APB4(CpuifTestMode):
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvAPB4_Cpuif) -> list[tuple[str, bool, int]]:
+    def output_signals(cpuif: SvAPB4_Cpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("pready",  False, 1),
