@@ -118,7 +118,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -r tests/requirements.txt
-          mypy --install-types --non-interactive src/peakrdl_regblock_vhdl
 
       - name: Install
         run: |
