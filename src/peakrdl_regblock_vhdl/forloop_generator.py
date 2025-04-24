@@ -40,7 +40,7 @@ class LoopBody(Body):
 
 class ForLoopGenerator:
     loop_type = "loop"
-    loop_body_cls: type[LoopBody] = LoopBody
+    loop_body_cls: "type[LoopBody]" = LoopBody
 
     def __init__(self) -> None:
         self._loop_level = 0
