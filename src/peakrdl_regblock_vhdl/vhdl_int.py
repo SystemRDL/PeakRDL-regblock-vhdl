@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Optional
+from typing import Optional, Union
 from enum import Enum
 
 
@@ -128,7 +128,7 @@ class VhdlInt:
         return cls(value, width=width, kind=VhdlIntType.BIT_STRING_UNSIGNED, allow_std_logic=allow_std_logic)
 
 
-def zero_pad(identifier: VhdlInt | str, num: int=1) -> VhdlInt | str:
+def zero_pad(identifier: Union[VhdlInt, str], num: int=1) -> Union[VhdlInt, str]:
     """Pad `num` zeros on the left (unsigned sign extension)
 
     If str, assume it is a VHDL identifier.

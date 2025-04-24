@@ -35,6 +35,8 @@ class Readback:
                f"signal readback_array : std_logic_vector_array1(0 to {self.array_size-1})({cpuif.data_width-1} downto 0);",
             ])
             if self.ds.retime_read_fanin:
+                if self.fanin_array_size is None:
+                    raise RuntimeError("fanin_array_size should not be None when read fanin is enabled")
                 declarations.extend([
                    f"signal readback_array_c : std_logic_vector_array1(0 to {self.fanin_array_size-1})({cpuif.data_width-1} downto 0);",
                    f"signal readback_array_r : std_logic_vector_array1(0 to {self.fanin_array_size-1})({cpuif.data_width-1} downto 0);",
@@ -62,6 +64,8 @@ class Readback:
         """Size of readback fanin array, or None if read fanin is disabled"""
         if not self.ds.retime_read_fanin:
             return None
+        if self.fanin_stride is None:
+            raise RuntimeError("fanin_stride should not be None when read fanin is enabled")
 
         # Number of array elements to reduce to.
         # Round up to an extra element in case there is some residual
@@ -81,6 +85,11 @@ class Readback:
         }
 
         if self.ds.retime_read_fanin:
+            if self.fanin_stride is None:
+                raise RuntimeError("fanin_stride should not be None when read fanin is enabled")
+            if self.fanin_array_size is None:
+                raise RuntimeError("fanin_array_size should not be None when read fanin is enabled")
+
             # leftovers are handled in an extra array element
             fanin_residual_stride = self.array_size % self.fanin_stride
 

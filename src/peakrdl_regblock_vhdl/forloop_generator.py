@@ -16,7 +16,7 @@ class Body:
         return s
 
 class LoopBody(Body):
-    def __init__(self, dim: int, iterator: str, loop_type: str, label: Union[str, None] = None) -> None:
+    def __init__(self, dim: int, iterator: str, loop_type: str, label: Optional[str] = None) -> None:
         super().__init__()
         self.dim = dim
         self.iterator = iterator
@@ -40,7 +40,7 @@ class LoopBody(Body):
 
 class ForLoopGenerator:
     loop_type = "loop"
-    loop_body_cls = LoopBody
+    loop_body_cls: type[LoopBody] = LoopBody
 
     def __init__(self) -> None:
         self._loop_level = 0
@@ -50,7 +50,7 @@ class ForLoopGenerator:
     def current_loop(self) -> Body:
         return self._stack[-1]
 
-    def push_loop(self, dim: int, label: Union[str | None] = None) -> None:
+    def push_loop(self, dim: int, label: Optional[str] = None) -> None:
         i = f"i{self._loop_level}"
         b = self.loop_body_cls(dim, i, self.loop_type, label)
         self._stack.append(b)
