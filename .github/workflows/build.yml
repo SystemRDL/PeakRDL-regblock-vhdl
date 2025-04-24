@@ -125,7 +125,7 @@ jobs:
 
       - name: Type Check
         run: |
-          mypy --config-file tests/mypy.ini --install-types src/peakrdl_regblock_vhdl
+          mypy --config-file tests/mypy.ini src/peakrdl_regblock_vhdl
 
 #-------------------------------------------------------------------------------
   build:

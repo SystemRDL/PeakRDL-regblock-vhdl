@@ -13,7 +13,7 @@ class Passthrough(CpuifTestMode):
     tb_template = "tb_inst.sv"
 
     @staticmethod
-    def input_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, bool, int]]:
+    def input_signals(cpuif: SvPassthroughCpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("s_cpuif_req",       False, 1),
@@ -24,7 +24,7 @@ class Passthrough(CpuifTestMode):
         ]
 
     @staticmethod
-    def output_signals(cpuif: SvPassthroughCpuif) -> list[tuple[str, bool, int]]:
+    def output_signals(cpuif: SvPassthroughCpuif) -> "list[tuple[str, bool, int]]":
         """Return tuples of (name, is_vector, width)"""
         return [
             ("s_cpuif_req_stall_wr", False, 1),
