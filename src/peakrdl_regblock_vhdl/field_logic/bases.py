@@ -35,9 +35,9 @@ class AssignmentPrecedence(enum.IntEnum):
 
 
 
-class SVLogic:
+class VhdlLogic:
     """
-    Represents a SystemVerilog logic signal
+    Represents a VHDL logic signal
     """
     def __init__(self, name: str, width: int, default_assignment: str) -> None:
         self.name = name
@@ -45,7 +45,7 @@ class SVLogic:
         self.default_assignment = default_assignment
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, SVLogic):
+        if not isinstance(o, VhdlLogic):
             return False
 
         return (
@@ -97,7 +97,7 @@ class NextStateConditional:
         """
         raise NotImplementedError
 
-    def get_extra_combo_signals(self, field: 'FieldNode') -> List[SVLogic]:
+    def get_extra_combo_signals(self, field: 'FieldNode') -> List[VhdlLogic]:
         """
         Return any additional combinational signals that this conditional
         will assign if present.

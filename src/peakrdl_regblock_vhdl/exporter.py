@@ -62,16 +62,16 @@ class RegblockExporter:
         node: AddrmapNode
             Top-level SystemRDL node to export.
         output_dir: str
-            Path to the output directory where generated SystemVerilog will be written.
+            Path to the output directory where generated VHDL will be written.
             Output includes two files: a module definition and package definition.
         cpuif_cls: :class:`peakrdl_regblock_vhdl.cpuif.CpuifBase`
             Specify the class type that implements the CPU interface of your choice.
             Defaults to AMBA APB4.
         module_name: str
-            Override the SystemVerilog module name. By default, the module name
+            Override the VHDL entity name. By default, the module name
             is the top-level node's name.
         package_name: str
-            Override the SystemVerilog package name. By default, the package name
+            Override the VHDL package name. By default, the package name
             is the top-level node's name with a "_pkg" suffix.
         reuse_hwif_typedefs: bool
             By default, the exporter will attempt to re-use hwif struct definitions for

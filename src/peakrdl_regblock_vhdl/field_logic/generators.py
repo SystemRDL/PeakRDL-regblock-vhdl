@@ -16,7 +16,7 @@ from .bases import NextStateUnconditional
 if TYPE_CHECKING:
     from . import FieldLogic
     from systemrdl.node import Node, FieldNode, AddressableNode
-    from .bases import SVLogic
+    from .bases import VhdlLogic
 
 class CombinationalStructGenerator(RDLFlatStructGenerator):
 
@@ -47,7 +47,7 @@ class CombinationalStructGenerator(RDLFlatStructGenerator):
             return
 
         # collect any extra combo signals that this field requires
-        extra_combo_signals = OrderedDict() # type: OrderedDict[str, SVLogic]
+        extra_combo_signals = OrderedDict() # type: OrderedDict[str, VhdlLogic]
         for conditional in self.field_logic.get_conditionals(node):
             for signal in conditional.get_extra_combo_signals(node):
                 if signal.name in extra_combo_signals:

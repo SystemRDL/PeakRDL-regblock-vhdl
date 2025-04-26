@@ -25,7 +25,7 @@ def get_indexed_path(top_node: Node, target_node: Node) -> str:
     # change multidimensonal indices from (x)(y)(z) to (x, y, z)
     path = re.sub(r'\)\(', ', ', path)
 
-    # Sanitize any SV keywords
+    # Sanitize any VHDL keywords
     def kw_filter_repl(m: Match) -> str:
         return kwf(m.group(0))
     path = re.sub(r'\w+', kw_filter_repl, path)

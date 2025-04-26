@@ -75,14 +75,14 @@ class Exporter(ExporterSubcommandPlugin):
             "--module-name",
             metavar="NAME",
             default=None,
-            help="Override the SystemVerilog module name"
+            help="Override the VHDL entity name"
         )
 
         arg_group.add_argument(
             "--package-name",
             metavar="NAME",
             default=None,
-            help="Override the SystemVerilog package name"
+            help="Override the VHDL package name"
         )
 
         arg_group.add_argument(
