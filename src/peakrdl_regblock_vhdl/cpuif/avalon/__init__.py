@@ -42,6 +42,10 @@ class Avalon_Cpuif_flattened(Avalon_Cpuif):
     is_interface = False
 
     @property
+    def package_name(self) -> Union[str, None]:
+        return None
+
+    @property
     def port_declaration(self) -> str:
         lines = [
             self.signal("read")               +  " : in std_logic;",
