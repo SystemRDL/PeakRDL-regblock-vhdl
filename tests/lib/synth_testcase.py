@@ -10,9 +10,10 @@ class SynthTestCase(BaseTestCase):
 
     def _get_synth_files(self) -> List[str]:
         files = []
-        files.extend(self.cpuif.get_synth_files())
-        files.append("regblock_pkg.sv")
-        files.append("regblock.sv")
+        files.extend(file for file in self.cpuif.get_synth_files() if file.endswith(".vhd"))
+        files.append("vhdl_regblock_pkg.vhd")
+        files.append("vhdl_regblock.vhd")
+        files.append("../../../../hdl-src/reg_utils.vhd")
 
         return files
 
