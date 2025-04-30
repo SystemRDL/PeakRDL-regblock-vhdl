@@ -3,7 +3,7 @@ Register Block Architecture
 
 The generated register block RTL is organized into several sections.
 Each section is automatically generated based on the source register model and
-is rendered into the output register block SystemVerilog RTL.
+is rendered into the output register block VHDL RTL.
 
 .. figure:: diagrams/arch.png
 

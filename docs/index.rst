@@ -22,16 +22,17 @@ The easiest way to use PeakRDL-regblock-vhdl is via the  `PeakRDL command line t
     python3 -m pip install peakrdl-regblock-vhdl[cli]
 
     # Export!
-    peakrdl regblock atxmega_spi.rdl -o regblock/ --cpuif axi4-lite
+    peakrdl regblock-vhdl atxmega_spi.rdl -o regblock/ --cpuif axi4-lite
 
 
 Links
 -----
 
-- `Source repository <https://github.com/SystemRDL/PeakRDL-regblock>`_
-- `Release Notes <https://github.com/SystemRDL/PeakRDL-regblock/releases>`_
-- `Issue tracker <https://github.com/SystemRDL/PeakRDL-regblock/issues>`_
-- `PyPi <https://pypi.org/project/peakrdl-regblock>`_
+- `Source repository <https://github.com/SystemRDL/PeakRDL-regblock-vhdl>`_
+- `Release Notes <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/releases>`_
+- `Issue tracker <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/issues>`_
+- `PyPi <https://pypi.org/project/peakrdl-regblock-vhdl>`_
+- `SystemVerilog Exporter <https://github.com/SystemRDL/PeakRDL-regblock>`_
 - `SystemRDL Specification <http://accellera.org/downloads/standards/systemrdl>`_
 
 
