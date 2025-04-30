@@ -47,7 +47,7 @@ CPU interface.
 
 The APB4 CPU interface comes in two i/o port flavors:
 
-SystemVerilog Interface
+VHDL Record Interface
     * Command line: ``--cpuif apb4``
     * Interface Definition: :download:`apb4_intf_pkg.vhd <../../hdl-src/apb4_intf_pkg.vhd>`
     * Class: :class:`peakrdl_regblock_vhdl.cpuif.apb4.APB4_Cpuif`

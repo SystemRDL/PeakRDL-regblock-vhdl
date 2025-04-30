@@ -1,4 +1,4 @@
-# Contributing to the PeakRDL-regblock code generator
+# Contributing to the PeakRDL-regblock-vhdl code generator
 We love your input! We want to make contributing to this project as easy and
 transparent as possible, whether it's:
 
@@ -9,13 +9,14 @@ transparent as possible, whether it's:
 - Becoming a maintainer
 
 
-## Open an issue using the [Issue Tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues)
+## Open an issue using the [Issue Tracker](https://github.com/SystemRDL/PeakRDL-regblock-vhdl/issues)
 Talking to us is the easiest way to contribute! Report a bug or feature request by
-[opening a new issue](https://github.com/SystemRDL/PeakRDL-regblock/issues).
+[opening a new issue](https://github.com/SystemRDL/PeakRDL-regblock-vhdl/issues).
 
 Issue submission expectations:
 * Please keep each issue submission limited to one topic. This helps us stay organized.
 * Before opening an issue, check if one already exists for your topic. It may have already been discussed.
+    * Check the upstream SystemVerilog regblock exporter [issue tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues) as well.
 * If submitting a bug, provide enough details so we can reproduce it on our end. (version number, example SystemRDL, etc...)
 * If submitting a feature request, please make sure ...
     * ... it does not violate the semantics of the SystemRDL standard.

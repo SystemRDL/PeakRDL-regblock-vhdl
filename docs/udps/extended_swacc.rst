@@ -15,7 +15,7 @@ functionality.
 
 Properties
 ----------
-These UDP definitions, along with others supported by PeakRDL-regblock can be
+These UDP definitions, along with others supported by PeakRDL-regblock-vhdl can be
 enabled by compiling the following file along with your design:
 :download:`regblock_udps.rdl <../../hdl-src/regblock_udps.rdl>`.
 
