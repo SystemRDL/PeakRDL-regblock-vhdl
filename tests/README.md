@@ -105,7 +105,7 @@ Each testcase group has its own folder and contains the following:
 : Empty file required for test discovery.
 
 `test_*/regblock.rdl`
-: Testcase RDL file. Testcase infrastructure will automatically compile this and generate the regblock output SystemVerilog.
+: Testcase RDL file. Testcase infrastructure will automatically compile this and generate the regblock output VHDL.
 
 `test_*/tb_template.sv`
 : Jinja template that defines the testcase-specific sequence.

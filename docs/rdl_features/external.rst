@@ -5,7 +5,7 @@ of an address space definition. In the context of this regblock generator,
 the implementation of an external component is left up to the designer. When
 generating the RTL for a regblock, the implementations of external components
 are omitted and instead a user-interface is presented on the
-``hwif_in``/``hwif_out`` i/o structs.
+``hwif_in``/``hwif_out`` i/o records.
 
 External component signals on the hardware interface closely follow the semantics
 of the :ref:`cpuif_protocol`.
@@ -82,7 +82,7 @@ hwif_in..rd_ack
     Qualifies all other read response signals.
 
     If the transfer is always completed in the same cycle, it is acceptable to
-    tie this signal to ``hwif_out..req && !hwif_out..req_is_wr``.
+    tie this signal to ``hwif_out..req and not hwif_out..req_is_wr``.
 
     If the register does not contain any readable fields, this signal is omitted.
 
@@ -97,7 +97,7 @@ hwif_in..wr_ack
     Single-cycle strobe indicating a write transfer has completed.
 
     If the transfer is always completed in the same cycle, it is acceptable to
-    tie this signal to ``hwif_out..req && hwif_out..req_is_wr``.
+    tie this signal to ``hwif_out..req and hwif_out..req_is_wr``.
 
     If the register does not contain any writable fields, this signal is omitted.
 

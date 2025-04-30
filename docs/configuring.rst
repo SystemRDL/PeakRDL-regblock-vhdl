@@ -1,13 +1,13 @@
 .. _peakrdl_cfg:
 
-Configuring PeakRDL-regblock
-============================
+Configuring PeakRDL-regblock-vhdl
+=================================
 
 If using the `PeakRDL command line tool <https://peakrdl.readthedocs.io/>`_,
 some aspects of the ``regblock`` command have additional configuration options
 available via the PeakRDL TOML file.
 
-All regblock-specific options are defined under the ``[regblock]`` TOML heading.
+All VHDL regblock-specific options are defined under the ``[regblock-vhdl]`` TOML heading.
 
 .. data:: cpuifs
 
@@ -20,7 +20,7 @@ All regblock-specific options are defined under the ``[regblock]`` TOML heading.
 
     .. code-block:: toml
 
-        [regblock]
+        [regblock-vhdl]
         cpuifs.my-cpuif-name = "my_cpuif_module:MyCPUInterfaceClass"
 
 
@@ -41,5 +41,5 @@ All regblock-specific options are defined under the ``[regblock]`` TOML heading.
 
     .. code-block:: toml
 
-        [regblock]
+        [regblock-vhdl]
         default_reset = "arst"

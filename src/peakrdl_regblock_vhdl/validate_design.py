@@ -137,7 +137,7 @@ class DesignValidator(RDLListener):
                     f"Software-writable field '{node.inst_name}' shall not span"
                     " multiple software-accessible subwords. Consider enabling"
                     " write double-buffering.\n"
-                    "For more details, see: https://peakrdl-regblock.readthedocs.io/en/latest/udps/write_buffering.html",
+                    "For more details, see: https://peakrdl-regblock-vhdl.readthedocs.io/en/latest/udps/write_buffering.html",
                     node.inst.inst_src_ref
                 )
 
@@ -149,7 +149,7 @@ class DesignValidator(RDLListener):
                     " subwords and is modified on-read, making it impossible to"
                     " access its value correctly. Consider enabling read"
                     " double-buffering. \n"
-                    "For more details, see: https://peakrdl-regblock.readthedocs.io/en/latest/udps/read_buffering.html",
+                    "For more details, see: https://peakrdl-regblock-vhdl.readthedocs.io/en/latest/udps/read_buffering.html",
                     node.inst.inst_src_ref
                 )
 

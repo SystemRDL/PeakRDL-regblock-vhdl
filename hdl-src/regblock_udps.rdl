@@ -4,7 +4,7 @@
  *
  * Compile this file prior to your other SystemRDL sources.
  *
- * For more details, see: https://peakrdl-regblock.readthedocs.io/en/latest/udps/intro.html
+ * For more details, see: https://peakrdl-regblock-vhdl.readthedocs.io/en/latest/udps/intro.html
  */
 
 property buffer_reads {

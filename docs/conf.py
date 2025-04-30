@@ -18,7 +18,7 @@ import datetime
 
 # -- Project information -----------------------------------------------------
 
-project = 'PeakRDL-regblock'
+project = 'PeakRDL-regblock-vhdl'
 copyright = '%d, Alex Mykyta' % datetime.datetime.now().year
 author = 'Alex Mykyta'
 
