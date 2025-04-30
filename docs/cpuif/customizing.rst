@@ -1,45 +1,57 @@
 Customizing the CPU interface
 =============================
 
-Use your own existing SystemVerilog interface definition
+Use your own existing VHDL record definition
 --------------------------------------------------------
 
-This exporter comes pre-bundled with its own SystemVerilog interface declarations.
-What if you already have your own SystemVerilog interface declaration that you prefer?
+This exporter comes pre-bundled with its own VHDL record interface declarations.
+What if you already have your own VHDL record declaration that you prefer?
 
 Not a problem! As long as your interface definition is similar enough, it is easy
-to customize and existing CPUIF definition.
+to customize an existing CPUIF definition.
 
 
-As an example, let's use the SystemVerilog interface definition for
+As an example, let's use the VHDL record definition for
 :ref:`cpuif_axi4lite` that is bundled with this project. This interface uses
 the following style and naming conventions:
 
-* SystemVerilog interface type name is ``axi4lite_intf``
-* Defines modports named ``master`` and ``slave``
-* Interface signals are all upper-case: ``AWREADY``, ``AWVALID``, etc...
+* VHDL input record type name is ``axi4lite_slave_in_intf``
+* VHDL output record type name is ``axi4lite_slave_out_intf``
+* Record signals are all upper-case: ``AWREADY``, ``AWVALID``, etc...
 
-Lets assume your preferred SV interface definition uses a slightly different naming convention:
+Lets assume your preferred VHDL record definition uses a slightly different naming convention:
 
-* SystemVerilog interface type name is ``axi4_lite_interface``
-* Modports are capitalized and use suffixes ``Master_mp`` and ``Slave_mp``
+* VHDL input record type name is ``axi4_lite_interface_in``
+* VHDL output record type name is ``axi4_lite_interface_out``
 * Interface signals are all lower-case: ``awready``, ``awvalid``, etc...
 
 Rather than rewriting a new CPU interface definition, you can extend and adjust the existing one:
 
 .. code-block:: python
 
-    from peakrdl_regblock.cpuif.axi4lite import AXI4Lite_Cpuif
+    from peakrdl_regblock_vhdl.cpuif.axi4lite import AXI4Lite_Cpuif
 
     class My_AXI4Lite(AXI4Lite_Cpuif):
+
         @property
         def port_declaration(self) -> str:
-            # Override the port declaration text to use the alternate interface name and modport style
-            return "axi4_lite_interface.Slave_mp s_axil"
+            # Override the port declaration text to use the alternate record name and case
+            return "\n".join([
+                "s_axil_i : in axi4_lite_interface_in(",
+               f"    awaddr({self.addr_width-1} downto 0),",
+               f"    wdata({self.data_width-1} downto 0),",
+               f"    wstrb({self.data_width_bytes-1} downto 0),",
+               f"    araddr({self.addr_width-1} downto 0)",
+                ");",
+                "s_axil_o : out axi4_lite_interface_out(",
+               f"    rdata({self.data_width-1} downto 0)",
+                ")",
+            ])
+
 
         def signal(self, name:str) -> str:
             # Override the signal names to be lowercase instead
-            return "s_axil." + name.lower()
+            return super().signal(name).lower()
 
 Then use your custom CPUIF during export:
 
@@ -59,9 +71,9 @@ Custom CPU Interface Protocol
 If you require a CPU interface protocol that is not included in this project,
 you can define your own.
 
-1. Create a SystemVerilog CPUIF implementation template file.
+1. Create a VHDL CPUIF implementation template file.
 
-    This contains the SystemVerilog implementation of the bus protocol. The logic
+    This contains the VHDL implementation of the bus protocol. The logic
     in this shall implement a translation between your custom protocol and the
     :ref:`cpuif_protocol`.
 
@@ -72,7 +84,7 @@ you can define your own.
 
 2. Create a Python class that defines your CPUIF
 
-    Extend your class from :class:`peakrdl_regblock.cpuif.CpuifBase`.
+    Extend your class from :class:`peakrdl_regblock_vhdl.cpuif.CpuifBase`.
     Define the port declaration string, and provide a reference to your template file.
 
 3. Use your new CPUIF definition when exporting.
@@ -99,12 +111,12 @@ that should be loaded, and made available as a command-line option in PeakRDL.
 
 .. code-block:: toml
 
-    [project.entry-points."peakrdl_regblock.cpuif"]
+    [project.entry-points."peakrdl_regblock_vhdl.cpuif"]
     my-cpuif = "my_package.my_module:MyCPUIF"
 
 
 *   ``my_package``: The name of your installable Python module
-*   ``peakrdl-regblock.cpuif``: This is the namespace that PeakRDL-regblock will
+*   ``peakrdl-regblock-vhdl.cpuif``: This is the namespace that PeakRDL-regblock will
     search. Any cpuif plugins you create must be enclosed in this namespace in
     order to be discovered.
 *   ``my_package.my_module:MyCPUIF``: This is the import path that

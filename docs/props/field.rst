@@ -45,7 +45,7 @@ being sampled during a software read operation, or as it is being written.
 
     {"signal": [
         {"name": "clk",             "wave": "p...."},
-        {"name": "hwif_in..next",   "wave": "x.=x.", "data": ["D"]},
+        {"name": "hwif_in..next_q", "wave": "x.=x.", "data": ["D"]},
         {"name": "hwif_out..swacc", "wave": "0.10."}
     ]}
 
@@ -100,10 +100,10 @@ hw
 Controls hardware access to the field.
 
 If readable, enables output signal ``hwif_out..value``. If writable, enables
-input ``hwif_in..next``.
+input ``hwif_in..next_q``.
 
 Hardware-writable fields can optionally define the ``next`` property which replaces
-the inferred ``hwif_in..next`` input with an alternate reference.
+the inferred ``hwif_in..next_q`` input with an alternate reference.
 
 
 hwclr/hwset
@@ -133,7 +133,7 @@ If true, infers the existence of input signal: ``hwif_in..we``, ``hwif_in..wel``
 
     {"signal": [
         {"name": "clk",             "wave": "p...."},
-        {"name": "hwif_in..next",   "wave": "x.=x.", "data": ["D"]},
+        {"name": "hwif_in..next_q", "wave": "x.=x.", "data": ["D"]},
         {"name": "hwif_in..we",     "wave": "0.10."},
         {"name": "hwif_in..wel",    "wave": "1.01."},
         {"name": "<field value>",   "wave": "x..=.", "data": ["D"]}
@@ -352,21 +352,21 @@ that an interrupt is active. This is an or-reduction of all interrupt fields
 after applying the appropriate ``enable`` or ``mask`` to the field value.
 
 level (default)
-    Interrupt is level-sensitive. If a bit on the field's ``hwif_in..next`` input
+    Interrupt is level-sensitive. If a bit on the field's ``hwif_in..next_q`` input
     is '1', it will trigger an interrupt event.
 
 posedge
-    If a bit on the field's ``hwif_in..next`` input transitions from '0' to '1',
+    If a bit on the field's ``hwif_in..next_q`` input transitions from '0' to '1',
     it will trigger an interrupt event. This transition shall still be synchronous
     to the register block's clock.
 
 negedge
-    If a bit on the field's ``hwif_in..next`` input transitions from '1' to '0',
+    If a bit on the field's ``hwif_in..next_q`` input transitions from '1' to '0',
     it will trigger an interrupt event. This transition shall still be synchronous
     to the register block's clock.
 
 bothedge
-    If a bit on the field's ``hwif_in..next`` input transitions from '0' to '1' or '1' to '0',
+    If a bit on the field's ``hwif_in..next_q`` input transitions from '0' to '1' or '1' to '0',
     it will trigger an interrupt event. This transition shall still be synchronous
     to the register block's clock.
 
@@ -418,7 +418,7 @@ The waveform below demonstrates a level-sensitive interrupt:
     {
         "signal": [
             {"name": "clk",                 "wave": "p....."},
-            {"name": "hwif_in..next",       "wave": "010..."},
+            {"name": "hwif_in..next_q",     "wave": "010..."},
             {"name": "<field value>",       "wave": "0.1..."}
         ]
     }
@@ -427,7 +427,7 @@ The waveform below demonstrates a level-sensitive interrupt:
 sticky
 ^^^^^^
 Unlike ``stickybit`` fields, a sticky field will latch an entire value. The
-value is latched as soon as ``hwif_in..next`` is nonzero, and is held until the
+value is latched as soon as ``hwif_in..next_q`` is nonzero, and is held until the
 field contents are cleared back to 0 by a software access.
 
 .. wavedrom::
@@ -435,7 +435,7 @@ field contents are cleared back to 0 by a software access.
     {
         "signal": [
             {"name": "clk",                 "wave": "p....."},
-            {"name": "hwif_in..next",       "wave": "23.22.", "data": [0,10,20,30]},
+            {"name": "hwif_in..next_q",     "wave": "23.22.", "data": [0,10,20,30]},
             {"name": "<field value>",       "wave": "2.3...", "data": [0, 10]}
         ]
     }
@@ -449,13 +449,12 @@ Misc
 encode
 ^^^^^^
 If assigned a user-defined enumeration, the resulting package file will include
-its definition. Due to limitations from type-strictness rules in SystemVerilog,
-the field will remain as a ``logic`` datatype.
+constants containing the enum values. The field will remain a ``std_logic_vector`` datatype.
 
 
 next
 ^^^^
-If assigned, replaces the inferred ``hwif_in..next`` input with an explicit reference.
+If assigned, replaces the inferred ``hwif_in..next_q`` input with an explicit reference.
 
 
 paritycheck
