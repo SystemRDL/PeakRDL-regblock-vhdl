@@ -24,6 +24,8 @@ The easiest way to use PeakRDL-regblock-vhdl is via the  `PeakRDL command line t
     # Export!
     peakrdl regblock-vhdl atxmega_spi.rdl -o regblock/ --cpuif axi4-lite
 
+Depending on the chosen CPU interface, the generated RTL may rely on VHDL packages
+available in the `hdl-src folder in the repository <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/tree/main/hdl-src>`_.
 
 Links
 -----
