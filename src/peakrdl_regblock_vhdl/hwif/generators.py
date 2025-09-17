@@ -5,7 +5,7 @@ from systemrdl.walker import WalkerAction
 
 from ..struct_generator import RDLFlatStructGenerator
 from ..identifier_filter import kw_filter as kwf
-from ..utils import clog2
+from ..utils import clog2, get_vhdl_type_slice_bounds
 
 if TYPE_CHECKING:
     from systemrdl.node import Node, SignalNode, AddressableNode, RegfileNode
@@ -34,13 +34,18 @@ class HWIFStructGenerator(RDLFlatStructGenerator):
         super().pop_struct()
         self.hwif_report_stack.pop()
 
-    def add_member(self, name: str, width: int = 1) -> None: # type: ignore # pylint: disable=arguments-differ
-        super().add_member(name, width)
+    def add_member(
+            self,
+            name: str,
+            width: int = 1,
+            array_dimensions: Optional[List[int]] = None,
+            *,
+            fracwidth: Optional[int] = None,
+            is_signed: Optional[bool] = None
+    ) -> None:
+        super().add_member(name, width, fracwidth=fracwidth, is_signed=is_signed)
 
-        if width > 1:
-            suffix = f"({width-1} downto 0)"
-        else:
-            suffix = ""
+        suffix = get_vhdl_type_slice_bounds(width, fracwidth, is_signed)
 
         path = ".".join(self.hwif_report_stack)
         if self.hwif.hwif_report_file:
@@ -112,7 +117,10 @@ class InputStructGenerator_Hier(HWIFStructGenerator):
         # Provide input to field's next value if it is writable by hw, and it
         # was not overridden by the 'next' property
         if node.is_hw_writable and node.get_property('next') is None:
-            self.add_member("next_q", node.width)
+            fracwidth = node.get_property("fracwidth")
+            is_signed = node.get_property("is_signed")
+
+            self.add_member("next_q", node.width, fracwidth=fracwidth, is_signed=is_signed)
 
         # Generate implied inputs
         for prop_name in ["we", "wel", "swwe", "swwel", "hwclr", "hwset"]:
@@ -206,7 +214,10 @@ class OutputStructGenerator_Hier(HWIFStructGenerator):
 
         # Expose field's value if it is readable by hw
         if node.is_hw_readable:
-            self.add_member("value", node.width)
+            fracwidth = node.get_property("fracwidth")
+            is_signed = node.get_property("is_signed")
+
+            self.add_member("value", node.width, fracwidth=fracwidth, is_signed=is_signed)
 
         # Generate output bit signals enabled via property
         for prop_name in ["anded", "ored", "xored", "swmod", "swacc", "overflow", "underflow", "rd_swacc", "wr_swacc"]:

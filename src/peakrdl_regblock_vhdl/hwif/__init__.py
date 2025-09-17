@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING, Union, Optional, TextIO
+from typing import TYPE_CHECKING, Union, Optional, TextIO, overload
 
 from systemrdl.node import AddrmapNode, SignalNode, FieldNode, RegNode, AddressableNode
-from systemrdl.rdltypes import PropertyReference
+from systemrdl.rdltypes.references import PropertyReference
 
 from ..utils import get_indexed_path
 from ..identifier_filter import kw_filter as kwf

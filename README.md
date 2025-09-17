@@ -9,7 +9,7 @@ Compile SystemRDL into a VHDL control/status register (CSR) block.
 For the command line tool, see the [PeakRDL project](https://peakrdl.readthedocs.io).
 
 ## Documentation
-See the [PeakRDL-regblock-vhdl Documentation](http://peakrdl-regblock-vhdl.readthedocs.io) for more details
+See the [PeakRDL-regblock-vhdl Documentation](https://peakrdl-regblock-vhdl.readthedocs.io) for more details
 
 ## Relationship with PeakRDL-regblock
 This is a direct VHDL translation of the SystemVerilog regblock generator [PeakRDL-regblock](https://github.com/SystemRDL/PeakRDL-regblock). Updates from the upstream regblock implementation are converted to VHDL and merged into this repository.

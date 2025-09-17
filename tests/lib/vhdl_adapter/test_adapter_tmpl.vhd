@@ -1,6 +1,10 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.fixed_pkg.all;
+
+use work.vhdl_regblock_pkg.all;
+use work.reg_utils.all;
 
 {%- macro sig_type(width, is_vec=False) %}
 {%- if width == 1 and not is_vec -%}
@@ -49,7 +53,25 @@ end entity regblock_adapter_vhdl;
 
 architecture rtl of regblock_adapter_vhdl is
 
+    {%- if hwif.has_input_struct %}
+    signal hwif_in : regblock_in_t;
+    {%- endif %}
+    {%- if hwif.has_output_struct %}
+    signal hwif_out : regblock_out_t;
+    {%- endif %}
+
 begin
+
+    {%- for hwif_sig, width in hwif_signals %}
+    {%-   set vhdl_hwif_sig = hwif_sv_to_vhdl(hwif_sig) %}
+    {%-   if hwif_sig.startswith("hwif_in") %}
+    {%-     set from_func = "from_std_logic" if width == 1 else "from_std_logic_vector" %}
+    {{ vhdl_hwif_sig }} <= {{ from_func }}(\{{ hwif_sig }}\, {{ vhdl_hwif_sig }});
+    {%-   else %}
+    {%-     set to_func = "to_std_logic" if width == 1 else "to_std_logic_vector" %}
+    \{{ hwif_sig }}\ <= {{ to_func }}({{ vhdl_hwif_sig }});
+    {%-   endif %}
+    {%- endfor %}
 
     dut: entity work.vhdl_regblock
         {%- if vhdl_cpuif.parameters %}
@@ -80,10 +102,13 @@ begin
             {%- endfor %}
             {%- if hwif.has_input_struct or hwif.has_output_struct %},{% endif %}
 
-            {%- for hwif_sig, _ in hwif_signals %}
-            {{ hwif_sv_to_vhdl(hwif_sig) }} => \{{ hwif_sig }}\
-            {%-   if not loop.last %},{% endif -%}
-            {%- endfor %}
+            {%- if hwif.has_input_struct %}
+            hwif_in => hwif_in
+            {%- if hwif.has_output_struct %},{% endif %}
+            {%- endif %}
+            {%- if hwif.has_output_struct %}
+            hwif_out => hwif_out
+            {%- endif %}
         );
 
 end architecture;

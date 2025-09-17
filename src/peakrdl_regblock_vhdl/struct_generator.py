@@ -5,6 +5,7 @@ from collections import OrderedDict
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
 
 from .identifier_filter import kw_filter as kwf
+from .utils import get_vhdl_type, get_vhdl_type_slice_bounds
 
 if TYPE_CHECKING:
     from typing import Union
@@ -98,16 +99,24 @@ class StructGenerator:
         self._struct_stack.append(s)
 
 
-    def add_member(self, name: str, width: int = 1, array_dimensions: Optional[List[int]] = None) -> None:
+    def add_member(
+            self,
+            name: str,
+            width: int = 1,
+            array_dimensions: Optional[List[int]] = None,
+            *,
+            fracwidth: Optional[int] = None,
+            is_signed: Optional[bool] = None,
+    ) -> None:
         if array_dimensions:
-            suffix = f"_array{len(array_dimensions)}(" + ", ".join(("0 to " + str(n - 1) for n in array_dimensions)) + ")"
+            array_suffix = f"_array{len(array_dimensions)}(" + ", ".join(("0 to " + str(n - 1) for n in array_dimensions)) + ")"
         else:
-            suffix = ""
+            array_suffix = ""
 
-        if width == 1:
-            m = f"{name} : std_logic{suffix};"
-        else: # width > 1
-            m = f"{name} : std_logic_vector{suffix}({width - 1} downto 0);"
+        sig_type = get_vhdl_type(width, fracwidth, is_signed)
+        slice_bounds = get_vhdl_type_slice_bounds(width, fracwidth, is_signed)
+
+        m = f"{name} : {sig_type}{array_suffix}{slice_bounds};"
 
         self.current_struct.children.append(m)
 

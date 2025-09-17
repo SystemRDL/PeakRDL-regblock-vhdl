@@ -1,11 +1,12 @@
 import re
-from typing import Match, Union, Optional
+from typing import Match, Union, Optional, overload
 
 from systemrdl.rdltypes.references import PropertyReference
-from systemrdl.node import Node, AddrmapNode
+from systemrdl.node import Node, AddrmapNode, FieldNode
 
 from .identifier_filter import kw_filter as kwf
 from .vhdl_int import VhdlInt
+
 
 def get_indexed_path(top_node: Node, target_node: Node) -> str:
     """
@@ -104,3 +105,44 @@ def do_bitswap(value: Union[VhdlInt, str]) -> Union[VhdlInt, str]:
             vswap = (vswap << 1) + (v & 1)
             v >>= 1
         return VhdlInt(vswap, value.width, value.kind, value.allow_std_logic)
+
+@overload
+def get_vhdl_type(width: FieldNode) -> str: ...
+
+@overload
+def get_vhdl_type(width: int, fracwidth: Optional[int], is_signed: Optional[bool]) -> str: ...
+
+def get_vhdl_type(
+        width: Union[FieldNode, int],
+        fracwidth: Optional[int]=None,
+        is_signed: Optional[bool]=None,
+) -> str:
+    if isinstance(width, FieldNode):
+        obj = width
+        width = obj.width
+        is_signed = obj.get_property("is_signed")
+        fracwidth = obj.get_property("fracwidth")
+
+    if fracwidth is not None:
+        if is_signed:
+            return "sfixed"
+        else:
+            return "ufixed"
+    elif is_signed is not None:
+        if is_signed:
+            return "signed"
+        else:
+            return "unsigned"
+    else:
+        if width == 1:
+            return "std_logic"
+        else:
+            return "std_logic_vector"
+
+def get_vhdl_type_slice_bounds(width: int, fracwidth: Optional[int], is_signed: Optional[bool]) -> str:
+    vhdl_type = get_vhdl_type(width, fracwidth, is_signed)
+    if vhdl_type == "std_logic":
+        return ""
+
+    lsb = 0 if fracwidth is None else -fracwidth
+    return f"({width + lsb - 1} downto {lsb})"

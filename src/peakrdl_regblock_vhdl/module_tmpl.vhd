@@ -2,6 +2,7 @@
 --  https://github.com/SystemRDL/PeakRDL-regblock-vhdl
 library ieee;
 context ieee.ieee_std_context;
+use ieee.fixed_pkg.all;
 
 use work.{{ds.module_name}}_pkg.all;
 {%- if cpuif.package_name %}

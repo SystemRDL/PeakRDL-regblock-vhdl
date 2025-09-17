@@ -297,6 +297,21 @@ class FieldLogicGenerator(RDLForLoopGenerator):
         if self.exp.hwif.has_value_output(node):
             output_identifier = self.exp.hwif.get_output_identifier(node)
             value = self.exp.dereferencer.get_value(node)
+
+            # type conversion
+            is_signed = node.get_property('is_signed')
+            fracwidth = node.get_property('fracwidth')
+            if fracwidth is not None:
+                if is_signed:
+                    value = f"sfixed(to_signed({value}))"
+                else:
+                    value = f"ufixed(to_unsigned({value}))"
+            elif is_signed is not None:
+                if is_signed:
+                    value = f"to_signed({value})"
+                else:
+                    value = f"to_unsigned({value})"
+
             self.add_content(
                 f"{output_identifier} <= {value};"
             )

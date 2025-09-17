@@ -1,5 +1,6 @@
 import os
 from itertools import product
+from typing import Set, Tuple
 
 import jinja2 as jj
 from systemrdl.walker import RDLWalker
@@ -90,7 +91,7 @@ class SvInputStructSignals(InputStructGenerator_Hier):
     input signals and their widths
     """
     def get_signals(self, node: 'Node') -> "list[tuple[str, int]]":
-        self.signals = set()
+        self.signals: Set[Tuple[str, int]] = set()
         self.start("don't care")
 
         walker = RDLWalker(unroll=False)
@@ -99,8 +100,8 @@ class SvInputStructSignals(InputStructGenerator_Hier):
         self.finish()
         return sorted(self.signals)
 
-    def add_member(self, name: str, width: int = 1) -> None:
-        super().add_member(name, width)
+    def add_member(self, name: str, width: int = 1, *, lsb: int = 0, signed: bool = False) -> None:
+        super().add_member(name, width, lsb=lsb, signed=signed)
         prefixes = ["hwif_in"]
         for s in self._struct_stack:
             if s.inst_name is None:
@@ -137,8 +138,8 @@ class SvOutputStructSignals(OutputStructGenerator_Hier):
         self.finish()
         return sorted(self.signals)
 
-    def add_member(self, name: str, width: int = 1) -> None:
-        super().add_member(name, width)
+    def add_member(self, name: str, width: int = 1, *, lsb: int = 0, signed: bool = False) -> None:
+        super().add_member(name, width, lsb=lsb, signed=signed)
         prefixes = ["hwif_out"]
         for s in self._struct_stack:
             if s.inst_name is None:

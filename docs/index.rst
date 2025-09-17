@@ -27,6 +27,13 @@ The easiest way to use PeakRDL-regblock-vhdl is via the  `PeakRDL command line t
 Depending on the chosen CPU interface, the generated RTL may rely on VHDL packages
 available in the `hdl-src folder in the repository <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/tree/main/hdl-src>`_.
 
+Looking for SystemVerilog?
+--------------------------
+This project generates VHDL RTL. If you prefer using SystemVerilog, check out
+the upstream project from which this exporter was forked:
+`PeakRDL-regblock <https://peakrdl-regblock.readthedocs.io>`_
+
+
 Links
 -----
 
@@ -34,7 +41,6 @@ Links
 - `Release Notes <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/releases>`_
 - `Issue tracker <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/issues>`_
 - `PyPi <https://pypi.org/project/peakrdl-regblock-vhdl>`_
-- `SystemVerilog Exporter <https://github.com/SystemRDL/PeakRDL-regblock>`_
 - `SystemRDL Specification <http://accellera.org/downloads/standards/systemrdl>`_
 
 
@@ -86,3 +92,5 @@ Links
     udps/read_buffering
     udps/write_buffering
     udps/extended_swacc
+    udps/signed
+    udps/fixedpoint

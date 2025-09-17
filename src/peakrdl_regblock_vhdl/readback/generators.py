@@ -5,7 +5,7 @@ from systemrdl.walker import WalkerAction
 
 from ..forloop_generator import RDLForLoopGenerator, LoopBody
 
-from ..utils import do_bitswap, do_slice
+from ..utils import do_bitswap, do_slice, get_vhdl_type
 
 if TYPE_CHECKING:
     from ..exporter import RegblockExporter
@@ -147,13 +147,19 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
                 self.add_content(f"readback_array({self.current_offset_str})({field.low-1} downto {current_bit}) <= (others => '0');")
 
             value = self.exp.dereferencer.get_value(field)
+            if self.exp.hwif.has_value_input(field) and not field.implements_storage:
+                # the value is a hwif input, which may not be a std_logic_vector, convert it
+                if get_vhdl_type(field) != "std_logic_vector":
+                    value = f"to_std_logic_vector({value})"
+            elif field.implements_storage:
+                # the value is in field storage, which may be a std_logic
+                if field.width == 1:
+                    value = f"to_std_logic_vector({value})"
+
             if field.msb < field.lsb:
                 # Field gets bitswapped since it is in [low:high] orientation
                 value = do_bitswap(value)
 
-            if field.width == 1:
-                # convert from std_logic to std_logic_vector
-                value = f"(0 => {value})"
             self.add_content(f"readback_array({self.current_offset_str})({field.high} downto {field.low}) <= {value} when {rd_strb} else (others => '0');")
 
             current_bit = field.high + 1

@@ -3,6 +3,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.fixed_pkg.all;
 
 package {{ds.package_name}} is
     constant {{ds.module_name.upper()}}_DATA_WIDTH : integer := {{ds.cpuif_data_width}};
