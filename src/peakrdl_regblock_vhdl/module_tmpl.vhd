@@ -153,9 +153,9 @@ begin
                     external_pending <= '0';
                 end if;
                 --pragma translate_off
-                assert not external_wr_ack or (external_pending or external_req)
+                assert_bad_ext_wr_ack: assert not external_wr_ack or (external_pending or external_req)
                     report "An external wr_ack strobe was asserted when no external request was active";
-                assert not external_rd_ack or (external_pending or external_req)
+                assert_bad_ext_rd_ack: assert not external_rd_ack or (external_pending or external_req)
                     report "An external rd_ack strobe was asserted when no external request was active";
                 --pragma translate_on
             end if;

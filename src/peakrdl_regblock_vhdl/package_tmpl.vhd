@@ -6,12 +6,13 @@ use ieee.numeric_std.all;
 use ieee.fixed_pkg.all;
 
 package {{ds.package_name}} is
-    constant {{ds.module_name.upper()}}_DATA_WIDTH : integer := {{ds.cpuif_data_width}};
-    constant {{ds.module_name.upper()}}_MIN_ADDR_WIDTH : integer := {{ds.addr_width}};
-    constant {{ds.module_name.upper()}}_SIZE : integer := {{ds.top_node.size}};
 
-    {{hwif.get_extra_package_params()|indent}}
+    constant {{ds.module_name.upper()}}_DATA_WIDTH : positive := {{ds.cpuif_data_width}};
+    constant {{ds.module_name.upper()}}_MIN_ADDR_WIDTH : positive := {{ds.addr_width}};
+    constant {{ds.module_name.upper()}}_SIZE : positive := {{ds.top_node.size}};
 
-    {{hwif.get_package_contents()|indent}}
+    {{-hwif.get_extra_package_params()|indent}}
+
+    {{-hwif.get_package_contents()|indent}}
 end package;
 {# (eof newline anchor) #}

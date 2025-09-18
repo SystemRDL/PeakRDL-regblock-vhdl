@@ -1,10 +1,10 @@
 {%- if cpuif.is_interface -%}
 -- pragma translate_off
 cpuif_generics: process begin
-    assert {{cpuif.signal("araddr")}}'length >= {{ds.module_name.upper()}}_MIN_ADDR_WIDTH
+    assert_bad_addr_width: assert {{cpuif.signal("araddr")}}'length >= {{ds.module_name.upper()}}_MIN_ADDR_WIDTH
         report "Interface address width of " & integer'image({{cpuif.signal("araddr")}}'length) & " is too small. Shall be at least " & integer'image({{ds.module_name.upper()}}_MIN_ADDR_WIDTH) & " bits"
         severity failure;
-    assert {{cpuif.signal("wdata")}}'length = {{ds.module_name.upper()}}_DATA_WIDTH
+    assert_bad_data_width: assert {{cpuif.signal("wdata")}}'length = {{ds.module_name.upper()}}_DATA_WIDTH
         report "Interface data width of " & integer'image({{cpuif.signal("wdata")}}'length) & " is incorrect. Shall be " & integer'image({{ds.module_name.upper()}}_DATA_WIDTH) & " bits"
         severity failure;
     wait;
