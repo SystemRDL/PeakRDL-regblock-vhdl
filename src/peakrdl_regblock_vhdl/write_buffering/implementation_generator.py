@@ -26,6 +26,9 @@ class WBufLogicGenerator(RDLForLoopGenerator):
         if not node.get_property('buffer_writes'):
             return
 
+        if node.external:
+            return
+
         regwidth = node.get_property('regwidth')
         accesswidth = node.get_property('accesswidth')
         strb_prefix = self.exp.dereferencer.get_access_strobe(node, reduce_substrobes=False)

@@ -33,6 +33,9 @@ class WBufStorageStructGenerator(RDLFlatStructGenerator):
         if not node.get_property('buffer_writes'):
             return
 
+        if node.external:
+            return
+
         regwidth = node.get_property('regwidth')
         self.add_member("data", regwidth)
         self.add_member("biten", regwidth)

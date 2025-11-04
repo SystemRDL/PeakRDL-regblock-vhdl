@@ -136,6 +136,8 @@ def get_vhdl_type(
     else:
         if width == 1:
             return "std_logic"
+        elif width == 0:
+            return "std_logic"
         else:
             return "std_logic_vector"
 

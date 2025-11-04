@@ -84,5 +84,8 @@ class RBufStorageStructGenerator(RDLFlatStructGenerator):
         if not node.get_property('buffer_reads'):
             return
 
+        if node.external:
+            return
+
         regwidth = node.get_property('regwidth')
         self.add_member("data", regwidth)

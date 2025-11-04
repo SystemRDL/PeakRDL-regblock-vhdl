@@ -25,6 +25,9 @@ class RBufLogicGenerator(RDLForLoopGenerator):
         if not node.get_property('buffer_reads'):
             return
 
+        if node.external:
+            return
+
         context = {
             'node': node,
             'rbuf': self.rbuf,
