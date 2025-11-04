@@ -248,7 +248,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
 
                 if field.width == 1:
                     # convert from std_logic to std_logic_vector
-                    value = f"(0 => {value})"
+                    value = f"to_std_logic_vector({value})"
                 self.add_content(f"readback_array({self.current_offset_str})({field.high} downto {field.low}) <= {value} when {rd_strb} else (others => '0');")
                 bidx = field.high + 1
 
@@ -317,7 +317,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
 
                     if field.width == 1:
                         # convert from std_logic to std_logic_vector
-                        value = f"(0 => {value})"
+                        value = f"to_std_logic_vector({value})"
                     self.add_content(f"readback_array({self.current_offset_str})({high} downto {low}) <= {value} when {rd_strb} else (others => '0');")
 
                     current_bit = field.high + 1
