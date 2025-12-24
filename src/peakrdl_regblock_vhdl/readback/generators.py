@@ -6,6 +6,7 @@ from systemrdl.walker import WalkerAction
 from ..forloop_generator import RDLForLoopGenerator, LoopBody
 
 from ..utils import do_bitswap, do_slice, get_vhdl_type
+from ..vhdl_int import VhdlInt
 
 if TYPE_CHECKING:
     from ..exporter import RegblockExporter
@@ -155,6 +156,9 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
                 # the value is in field storage, which may be a std_logic
                 if field.width == 1:
                     value = f"to_std_logic_vector({value})"
+            elif isinstance(value, VhdlInt):
+                # the value is a constant, ensure it's not reduced to a std_logic
+                value.allow_std_logic = False
 
             if field.msb < field.lsb:
                 # Field gets bitswapped since it is in [low:high] orientation
