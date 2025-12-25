@@ -106,6 +106,23 @@ def do_bitswap(value: Union[VhdlInt, str]) -> Union[VhdlInt, str]:
             v >>= 1
         return VhdlInt(vswap, value.width, value.kind, value.allow_std_logic)
 
+class ArrayWidth(int):
+    """Integer subtype representing an array width (positive integer).
+    Ensures the value is an int >= 1.
+
+    Used to represent the width of an array (std_logic_vector) so that
+    a non-array (std_logic) is not inferred.
+    """
+    def __new__(cls, value: int) -> "ArrayWidth":
+        if not isinstance(value, int):
+            raise TypeError(f"ArrayWidth must be an int, got {type(value).__name__}")
+        if value < 1:
+            raise ValueError(f"ArrayWidth must be >= 1, got {value}")
+        return int.__new__(cls, value)
+
+    def __repr__(self) -> str:
+        return f"ArrayWidth({int(self)})"
+
 @overload
 def get_vhdl_type(width: FieldNode) -> str: ...
 
@@ -134,7 +151,7 @@ def get_vhdl_type(
         else:
             return "unsigned"
     else:
-        if width == 1:
+        if width == 1 and not isinstance(width, ArrayWidth):
             return "std_logic"
         else:
             return "std_logic_vector"
