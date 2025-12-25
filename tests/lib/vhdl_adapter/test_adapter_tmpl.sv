@@ -31,7 +31,7 @@ module regblock_adapter_sv
     regblock_adapter_vhdl
     {%- if sv_cpuif.parameters %} #(
         {%- for param in sv_cpuif.parameters %}
-        {%- set param_name = param.removeprefix("parameter").split("=")[0].strip() %}
+        {%- set param_name = param[len("parameter"):].split("=")[0].strip() %}
         .{{param_name}}({{param_name}}){% if not loop.last %},{% endif %}
         {%- endfor %}
     )
