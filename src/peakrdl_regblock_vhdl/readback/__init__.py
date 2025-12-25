@@ -41,6 +41,7 @@ class Readback:
                    f"signal readback_array_c : std_logic_vector_array1(0 to {self.fanin_array_size-1})({cpuif.data_width-1} downto 0);",
                    f"signal readback_array_r : std_logic_vector_array1(0 to {self.fanin_array_size-1})({cpuif.data_width-1} downto 0);",
                     "signal readback_done_r : std_logic;",
+                    "signal readback_err_r : std_logic;",
                 ])
         return "\n".join(declarations)
 

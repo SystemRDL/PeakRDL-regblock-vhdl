@@ -11,31 +11,13 @@ use work.{{cpuif.package_name}}.all;
 use work.reg_utils.all;
 
 entity {{ds.module_name}} is
-    {%- if cpuif.parameters %}
+    {%- if module_has_parameters() %}
     generic (
-        {{";\n        ".join(cpuif.parameters)}}
+        {{get_module_parameter_list()|indent(8)}}
     );
     {%- endif %}
     port (
-        clk : in std_logic;
-        {{default_resetsignal_name}} : in std_logic;
-
-        {%- for signal in ds.out_of_hier_signals.values() %}
-        {%- if signal.width == 1 %}
-        {{kwf(signal.inst_name)}} : in std_logic;
-        {%- else %}
-        {{kwf(signal.inst_name)}} : in std_logic_vector({{signal.width-1}} downto 0);
-        {%- endif %}
-        {%- endfor %}
-
-        {%- if ds.has_paritycheck %}
-        parity_error : out std_logic;
-        {%- endif %}
-
-        {{cpuif.port_declaration|indent(8)}}
-        {%- if hwif.has_input_struct or hwif.has_output_struct %};{% endif %}
-
-        {{hwif.port_declaration|indent(8)}}
+        {{get_module_port_list()|indent(8)}}
     );
 end entity {{ds.module_name}};
 
@@ -62,40 +44,40 @@ architecture rtl of {{ds.module_name}} is
 
     {{cpuif.signal_declaration | indent}}
 
-    {%- if ds.has_external_addressable %}
+{%- if ds.has_external_addressable %}
     signal external_req : std_logic;
     signal external_pending : std_logic;
     signal external_wr_ack : std_logic;
     signal external_rd_ack : std_logic;
-    {%- endif %}
+{%- endif %}
 
-    {%- if ds.min_read_latency > ds.min_write_latency %}
+{%- if ds.min_read_latency > ds.min_write_latency %}
     signal cpuif_req_stall_sr : std_logic_vector({{ds.min_read_latency - ds.min_write_latency - 1}} downto 0);
-    {%- elif ds.min_read_latency < ds.min_write_latency %}
+{%- elif ds.min_read_latency < ds.min_write_latency %}
     signal cpuif_req_stall_sr : std_logic_vector({{ds.min_write_latency - ds.min_read_latency - 1}} downto 0);
-    {%- endif %}
+{%- endif %}
 
     ----------------------------------------------------------------------------
     -- Address Decode Signals
     ----------------------------------------------------------------------------
     {{address_decode.get_strobe_struct()|indent}}
     signal decoded_reg_strb : decoded_reg_strb_t;
-
-    {%- if ds.has_external_addressable %}
+    signal decoded_err : std_logic;
+{%- if ds.has_external_addressable %}
     signal decoded_strb_is_external : std_logic;
-    {% endif %}
-    {%- if ds.has_external_block %}
+{% endif %}
+{%- if ds.has_external_block %}
     signal decoded_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
-    {% endif %}
+{% endif %}
     signal decoded_req : std_logic;
     signal decoded_req_is_wr : std_logic;
     signal decoded_wr_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
     signal decoded_wr_biten : std_logic_vector({{cpuif.data_width-1}} downto 0);
 
-    {%- if ds.has_writable_msb0_fields %}
+{%- if ds.has_writable_msb0_fields %}
     signal decoded_wr_data_bswap : std_logic_vector({{cpuif.data_width-1}} downto 0);
     signal decoded_wr_biten_bswap : std_logic_vector({{cpuif.data_width-1}} downto 0);
-    {%- endif %}
+{%- endif %}
 
     ----------------------------------------------------------------------------
     -- Field Logic Signals
@@ -232,14 +214,23 @@ begin
             result := '1' when unsigned(L) = R else '0';
             return result;
         end;
+        variable is_valid_addr : std_logic;
+        variable is_invalid_rw : std_logic;
         {%- if ds.has_external_addressable %}
-        variable is_external: std_logic;
+        variable is_external : std_logic;
         {%- endif %}
     begin
     {%- if ds.has_external_addressable %}
         is_external := '0';
     {%- endif %}
+    {%- if ds.err_if_bad_addr %}
+        is_valid_addr := '0';
+    {%- else %}
+        is_valid_addr := '1'; -- No error checking on valid address access
+    {%- endif %}
+        is_invalid_rw := '0';
         {{address_decode.get_implementation()|indent(8)}}
+        decoded_err <= (not is_valid_addr or is_invalid_rw) and decoded_req;
     {%- if ds.has_external_addressable %}
         decoded_strb_is_external <= is_external;
         external_req <= is_external;
@@ -321,8 +312,12 @@ begin
 {%- else %}
     cpuif_wr_ack <= decoded_req and decoded_req_is_wr;
 {%- endif %}
+    {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
+    cpuif_wr_err <= decoded_err;
+    {%- else %}
     -- Writes are always granted with no error response
     cpuif_wr_err <= '0';
+    {%- endif %}
 
     ----------------------------------------------------------------------------
     -- Readback

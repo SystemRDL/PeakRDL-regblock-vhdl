@@ -30,7 +30,7 @@ class WBufStorageStructGenerator(RDLFlatStructGenerator):
     def enter_Reg(self, node: RegNode) -> None:
         super().enter_Reg(node)
 
-        if not node.get_property('buffer_writes'):
+        if not node.get_property('buffer_writes') or node.external:
             return
 
         regwidth = node.get_property('regwidth')

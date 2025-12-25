@@ -15,6 +15,13 @@ std_logic_vector({{width-1}} downto 0)
 {%- endmacro %}
 
 entity regblock_adapter_vhdl is
+    {%- if vhdl_cpuif.parameters %}
+    generic (
+        {%- for param in vhdl_cpuif.parameters %}
+        {{param}}{% if not loop.last %};{% endif %}
+        {%- endfor %}
+    );
+    {%- endif %}
     port (
         clk : in std_logic;
         {{default_resetsignal_name}} : in std_logic;
@@ -77,7 +84,8 @@ begin
         {%- if vhdl_cpuif.parameters %}
         generic map (
             {%- for param in vhdl_cpuif.parameters %}
-            {{param}} => {{param}},
+            {%- set param_name = param.split(":")[0].strip() %}
+            {{param_name}} => {{param_name}}{% if not loop.last %},{% endif %}
             {%- endfor %}
         )
         {%- endif %}

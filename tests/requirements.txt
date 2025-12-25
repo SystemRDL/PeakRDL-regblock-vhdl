@@ -1,7 +1,7 @@
 # hold back: https://github.com/kevlened/pytest-parallel/issues/118
 pytest<7.2
 
-peakrdl-regblock==1.1.0
+peakrdl-regblock==1.2.0
 parameterized
 pytest-parallel # TODO: deprecated. migrate to pytest-xdist
 jinja2-simple-tags

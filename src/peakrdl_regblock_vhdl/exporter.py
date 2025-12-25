@@ -119,6 +119,13 @@ class RegblockExporter:
             If overriden to True, default reset is active-low instead of active-high.
         default_reset_async: bool
             If overriden to True, default reset is asynchronous instead of synchronous.
+        err_if_bad_addr: bool
+            If overriden to True: If the address is decoded incorrectly, the CPUIF response
+            signal shows an error. For example: APB.PSLVERR = 1'b1, AXI4LITE.*RESP = 2'b10.
+        err_if_bad_rw: bool
+            If overriden to True: If an illegal access is performed to a read-only or write-only
+            register, the CPUIF response signal shows an error. For example: APB.PSLVERR = 1'b1,
+            AXI4LITE.*RESP = 2'b10.
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -164,6 +171,9 @@ class RegblockExporter:
         context = {
             "cpuif": self.cpuif,
             "hwif": self.hwif,
+            "module_has_parameters": self.module_has_parameters,
+            "get_module_parameter_list": self.get_module_parameter_list,
+            "get_module_port_list": self.get_module_port_list,
             "write_buffering": self.write_buffering,
             "read_buffering": self.read_buffering,
             "get_resetsignal": self.dereferencer.get_resetsignal,
@@ -193,6 +203,47 @@ class RegblockExporter:
 
         if hwif_report_file:
             hwif_report_file.close()
+
+    def module_has_parameters(self) -> bool:
+        return bool(self.cpuif.parameters)
+
+    def get_module_parameter_list(self) -> str:
+        return ";\n".join(self.cpuif.parameters)
+
+    def get_module_port_list(self) -> str:
+        groups = []
+
+        # Main clock & reset
+        clkrst = [
+            "clk : in std_logic",
+            f"{self.dereferencer.default_resetsignal_name} : in std_logic"
+        ]
+        groups.append(";\n".join(clkrst))
+
+        # Signals that were declared outside of the hierarchy of the addrmap
+        # being exported
+        out_of_hier_signals = []
+        for signal in self.ds.out_of_hier_signals.values():
+            if signal.width == 1:
+                out_of_hier_signals.append(f"{kwf(signal.inst_name)} : in std_logic")
+            else:
+                out_of_hier_signals.append(f"{kwf(signal.inst_name)} : in std_logic_vector({signal.width - 1} downto 0)")
+        if out_of_hier_signals:
+            groups.append(";\n".join(out_of_hier_signals))
+
+        # Parity check error output
+        if self.ds.has_paritycheck:
+            groups.append("parity_error : out std_logic")
+
+        # CPU interface ports
+        groups.append(self.cpuif.port_declaration)
+
+        if self.hwif.has_input_struct or self.hwif.has_output_struct:
+            groups.append(self.hwif.port_declaration)
+
+        return ";\n\n".join(groups)
+
+
 
 
 class DesignState:
@@ -224,6 +275,10 @@ class DesignState:
         # Default reset type
         self.default_reset_activelow = kwargs.pop("default_reset_activelow", False) # type: bool
         self.default_reset_async = kwargs.pop("default_reset_async", False) # type: bool
+
+        # Generating a cpuif error
+        self.err_if_bad_addr = kwargs.pop("err_if_bad_addr", False) # type: bool
+        self.err_if_bad_rw = kwargs.pop("err_if_bad_rw", False) # type: bool
 
         #------------------------
         # Info about the design

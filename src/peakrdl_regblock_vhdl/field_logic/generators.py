@@ -404,6 +404,7 @@ class FieldLogicGenerator(RDLForLoopGenerator):
         req_reset = VhdlInt.zeros(n_subwords)
 
         context = {
+            'node': node,
             "has_sw_writable": node.has_sw_writable,
             "has_sw_readable": node.has_sw_readable,
             "prefix": prefix,
@@ -431,6 +432,7 @@ class FieldLogicGenerator(RDLForLoopGenerator):
             retime = self.ds.retime_external_addrmap
 
         context = {
+            'node': node,
             "prefix": prefix,
             "strb": strb,
             "addr_width": addr_width,

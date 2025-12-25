@@ -35,12 +35,15 @@ process({{get_always_ff_event(cpuif.reset)}}) begin
     if {{get_resetsignal(cpuif.reset, asynch=True)}} then -- async reset
         readback_array_r <= (others => {{cpuif.data_width}}x"0");
         readback_done_r <= '0';
+        readback_err_r <= '0';
     elsif rising_edge(clk) then
         if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
             readback_array_r <= (others => {{cpuif.data_width}}x"0");
             readback_done_r <= '0';
+            readback_err_r <= '0';
         else
             readback_array_r <= readback_array_c;
+            readback_err_r <= decoded_err;
             {%- if ds.has_external_addressable %}
             readback_done_r <= decoded_req and not decoded_req_is_wr and not decoded_strb_is_external;
             {%- else %}
@@ -55,7 +58,11 @@ process(all)
     variable readback_data_var : std_logic_vector({{cpuif.data_width-1}} downto 0) := (others => '0');
 begin
     readback_done <= readback_done_r;
+    {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
+    readback_err <= readback_err_r;
+    {%- else %}
     readback_err <= '0';
+    {%- endif %}
     readback_data_var := (others => '0');
     for i in 0 to {{fanin_array_size-1}} loop
         readback_data_var := readback_data_var or readback_array_r(i);
@@ -74,7 +81,11 @@ begin
     {%- else %}
     readback_done <= decoded_req and not decoded_req_is_wr;
     {%- endif %}
+    {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
+    readback_err <= decoded_err;
+    {%- else %}
     readback_err <= '0';
+    {%- endif %}
     readback_data_var := (others => '0');
     for i in readback_array'RANGE loop
         readback_data_var := readback_data_var or readback_array(i);
@@ -88,5 +99,9 @@ end process;
 {%- else %}
 readback_done <= decoded_req and not decoded_req_is_wr;
 readback_data <= '0';
+{%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
+readback_err <= decoded_err;
+{%- else %}
 readback_err <= '0';
+{%- endif %}
 {% endif %}

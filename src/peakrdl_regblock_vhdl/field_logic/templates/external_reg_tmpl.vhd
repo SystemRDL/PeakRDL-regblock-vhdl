@@ -1,3 +1,4 @@
+-- External register: {{node.get_path()}}
 {% if retime -%}
 
 {%- macro ext_reg_reset() %}
@@ -35,7 +36,7 @@ end process;
 {%- else -%}
 
 
-{%- if has_sw_readable and has_sw_writable %}
+{%- if has_sw_readable and has_sw_writable -%}
 {{prefix}}.req <= {{strb}};
 {%- elif has_sw_readable and not has_sw_writable %}
 {{prefix}}.req <= {{strb}} when not decoded_req_is_wr else {{ req_reset }};
