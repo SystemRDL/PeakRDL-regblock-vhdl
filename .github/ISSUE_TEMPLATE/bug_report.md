@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-- [ ] I have verified this bug has not already been reported on the [upstream issue tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues)
+- [ ] I have verified this bug has not already been reported on the [upstream issue tracker](https://github.com/SystemRDL/PeakRDL-regblock/issues). Upstream bugfixes/features are merged into this repository with each upstream release.
 - [ ] I have reviewed this project's [contribution guidelines](https://github.com/SystemRDL/PeakRDL-regblock-vhdl/blob/main/CONTRIBUTING.md)
 
 **Describe the bug**
