@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class RBufLogicGenerator(RDLForLoopGenerator):
     loop_type = "generate"
     def __init__(self, rbuf: 'ReadBuffering') -> None:
-        super().__init__()
+        super().__init__("gen_rbuf_logic_")
         self.rbuf = rbuf
         self.exp = rbuf.exp
         self.template = self.exp.jj_env.get_template(
@@ -45,7 +45,10 @@ class RBufLogicGenerator(RDLForLoopGenerator):
             if field.msb < field.lsb:
                 # Field gets bitswapped since it is in [low:high] orientation
                 value = f"bitswap({value})"
-            s.append(f"{data}({field.high} downto {field.low}) <= {value};")
+            if field.high == field.low:
+                s.append(f"{data}({field.high}) <= {value};")
+            else:
+                s.append(f"{data}({field.high} downto {field.low}) <= {value};")
 
             bidx = field.high + 1
 

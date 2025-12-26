@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class WBufLogicGenerator(RDLForLoopGenerator):
     loop_type = "generate"
     def __init__(self, wbuf: 'WriteBuffering') -> None:
-        super().__init__()
+        super().__init__("gen_wbuf_logic_")
         self.wbuf = wbuf
         self.exp = wbuf.exp
         self.template = self.exp.jj_env.get_template(

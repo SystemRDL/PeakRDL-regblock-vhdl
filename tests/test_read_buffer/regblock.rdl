@@ -123,4 +123,25 @@ addrmap top {
     external regfile {
         myreg_wide reg1;
     } ext_block;
+
+    //--------------------------------------------------------------------------
+    // arrays
+    //--------------------------------------------------------------------------
+
+    regfile {
+      reg {
+        field {} rst = 0;
+      } reset;
+
+      reg {
+        regwidth = 128;
+        buffer_reads;
+        default sw = r;
+        default hw = w;
+        field {} f1[16];
+        field {} f2[32];
+        field {} f3[64];
+        field {} f4[1];
+      } fields;
+    } regfile_array[2];
 };
