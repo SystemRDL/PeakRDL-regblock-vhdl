@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import TYPE_CHECKING, Union, Any, Type, Optional, Set, List
 from collections import OrderedDict
 
@@ -126,6 +127,8 @@ class RegblockExporter:
             If overriden to True: If an illegal access is performed to a read-only or write-only
             register, the CPUIF response signal shows an error. For example: APB.PSLVERR = 1'b1,
             AXI4LITE.*RESP = 2'b10.
+        copy_utils_pkg: bool
+            If overridden to True, copy the reg_utils.vhd package into the output directory.
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -200,6 +203,12 @@ class RegblockExporter:
         template = self.jj_env.get_template("module_tmpl.vhd")
         stream = template.stream(context)
         stream.dump(module_file_path)
+
+        if self.ds.copy_utils_pkg:
+            shutil.copyfile(
+                os.path.join(os.path.dirname(__file__), "..", "..", "hdl-src", "reg_utils.vhd"),
+                os.path.join(output_dir, "reg_utils.vhd")
+            )
 
         if hwif_report_file:
             hwif_report_file.close()
@@ -279,6 +288,9 @@ class DesignState:
         # Generating a cpuif error
         self.err_if_bad_addr = kwargs.pop("err_if_bad_addr", False) # type: bool
         self.err_if_bad_rw = kwargs.pop("err_if_bad_rw", False) # type: bool
+
+        # General exporter options
+        self.copy_utils_pkg = kwargs.pop("copy_utils_pkg", False) # type: bool
 
         #------------------------
         # Info about the design

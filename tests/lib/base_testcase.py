@@ -108,9 +108,9 @@ class BaseTestCase(unittest.TestCase):
         rdlc.compile_file(rdl_file)
         root = rdlc.elaborate(self.rdl_elab_target, "regblock", self.rdl_elab_params)
 
-        for lang, exporter, cpuif_cls in (
-            ("", self.sv_exporter, self.cpuif.sv_cpuif_cls),
-            ("vhdl_", self.vhdl_exporter, self.cpuif.vhdl_cpuif_cls),
+        for lang, exporter, cpuif_cls, kwargs in (
+            ("", self.sv_exporter, self.cpuif.sv_cpuif_cls, {}),
+            ("vhdl_", self.vhdl_exporter, self.cpuif.vhdl_cpuif_cls, {"copy_utils_pkg": True}),
         ):
             exporter.export(
                 root,
@@ -129,6 +129,7 @@ class BaseTestCase(unittest.TestCase):
                 default_reset_async=self.default_reset_async,
                 err_if_bad_addr=self.err_if_bad_addr,
                 err_if_bad_rw=self.err_if_bad_rw,
+                **kwargs,
         )
         vhdl_adapter = VhdlAdapter(self.sv_exporter, self.vhdl_exporter, self.cpuif)
         vhdl_adapter.export(self.get_run_dir())

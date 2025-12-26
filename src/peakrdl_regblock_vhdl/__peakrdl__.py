@@ -24,6 +24,7 @@ class Exporter(ExporterSubcommandPlugin):
         "default_reset": schema.Choice(["rst", "rst_n", "arst", "arst_n"]),
         "err_if_bad_addr": schema.Boolean(),
         "err_if_bad_rw": schema.Boolean(),
+        "copy_utils_pkg": schema.Boolean(),
     }
 
     @functools.lru_cache()
@@ -161,6 +162,13 @@ class Exporter(ExporterSubcommandPlugin):
             performed to a read-only or write-only register."""
         )
 
+        arg_group.add_argument(
+            "--copy-utils-pkg",
+            action="store_true",
+            default=False,
+            help="Copy the reg_utils.vhd package into the output directory."
+        )
+
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         cpuifs = self.get_cpuifs()
 
@@ -224,5 +232,6 @@ class Exporter(ExporterSubcommandPlugin):
             default_reset_activelow=default_reset_activelow,
             err_if_bad_addr=options.err_if_bad_addr or self.cfg['err_if_bad_addr'],
             err_if_bad_rw=options.err_if_bad_rw or self.cfg['err_if_bad_rw'],
+            copy_utils_pkg=options.copy_utils_pkg,
             default_reset_async=default_reset_async,
         )

@@ -33,7 +33,7 @@ class Simulator:
         files = []
         files.extend(file for file in self.testcase.cpuif.get_sim_files() if file.endswith(".vhd"))
         files.extend(file for file in self.testcase.get_extra_tb_files() if file.endswith(".vhd"))
-        files.append("../../../../hdl-src/reg_utils.vhd")
+        files.append("reg_utils.vhd")
         files.append("vhdl_regblock_pkg.vhd")
         files.append("vhdl_regblock.vhd")
         files.append("regblock_adapter.vhd")
