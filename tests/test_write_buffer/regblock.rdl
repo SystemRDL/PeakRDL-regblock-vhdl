@@ -118,13 +118,9 @@ addrmap top {
 
     regfile {
       reg {
-        field {} rst = 0;
-      } reset;
-
-      reg {
         regwidth = 128;
         buffer_writes;
-        default sw = w;
+        default sw = rw;
         default hw = r;
         field {} f1[16] = 0;
         field {} f2[32] = 0;
@@ -132,4 +128,19 @@ addrmap top {
         field {} f4[1] = 0;
       } fields;
     } regfile_array[2];
+
+    //--------------------------------------------------------------------------
+    // signed/fixed-point
+    //--------------------------------------------------------------------------
+
+    reg {
+        regwidth = 32;
+        buffer_writes;
+        default sw = rw;
+        default hw = r;
+        field {is_signed; } f1[8] = 111;
+        field {fracwidth=1; } f2[8] = 222;
+        field {is_signed; } f3[1] = 0;
+        field {fracwidth=1; } f4[1] = 1;
+    } reg_fp;
 };

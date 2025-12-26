@@ -224,6 +224,19 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
                 # insert padding before
                 self.add_content(f"readback_array({self.current_offset_str})({field.low - 1} downto {bidx}) <= (others => '0');")
 
+            value = self.exp.dereferencer.get_value(field)
+            if self.exp.hwif.has_value_input(field) and not field.implements_storage:
+                # the value is a hwif input, which may not be a std_logic_vector, convert it
+                if get_vhdl_type(field) != "std_logic_vector":
+                    value = f"to_std_logic_vector({value})"
+            elif field.implements_storage:
+                # the value is in field storage, which may be a std_logic
+                if field.width == 1:
+                    value = f"to_std_logic_vector({value})"
+            elif isinstance(value, VhdlInt):
+                # the value is a constant, ensure it's not reduced to a std_logic
+                value.allow_std_logic = False
+
             if field.high >= accesswidth:
                 # field gets truncated
                 r_low = field.low
@@ -237,22 +250,19 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
                     f_low = field.width - 1 - f_low
                     f_high = field.width - 1 - f_high
                     f_low, f_high = f_high, f_low
-                    value = do_bitswap(do_slice(self.exp.dereferencer.get_value(field), f_high, f_low, reduce=False))
+                    value = do_slice(value, f_high, f_low, reduce=False)
+                    value = do_bitswap(value)
                 else:
-                    value = do_slice(self.exp.dereferencer.get_value(field), f_high, f_low, reduce=False)
+                    value = do_slice(value, f_high, f_low, reduce=False)
 
                 self.add_content(f"readback_array({self.current_offset_str})({r_high} downto {r_low}) <= {value} when {rd_strb} else (others => '0');")
                 bidx = accesswidth
             else:
                 # field fits in subword
-                value = self.exp.dereferencer.get_value(field)
                 if field.msb < field.lsb:
                     # Field gets bitswapped since it is in [low:high] orientation
                     value = do_bitswap(value)
 
-                if field.width == 1:
-                    # convert from std_logic to std_logic_vector
-                    value = f"to_std_logic_vector({value})"
                 self.add_content(f"readback_array({self.current_offset_str})({field.high} downto {field.low}) <= {value} when {rd_strb} else (others => '0');")
                 bidx = field.high + 1
 

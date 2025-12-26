@@ -130,10 +130,6 @@ addrmap top {
 
     regfile {
       reg {
-        field {} rst = 0;
-      } reset;
-
-      reg {
         regwidth = 128;
         buffer_reads;
         default sw = r;
@@ -144,4 +140,29 @@ addrmap top {
         field {} f4[1];
       } fields;
     } regfile_array[2];
+
+    //--------------------------------------------------------------------------
+    // signed/fixed-point
+    //--------------------------------------------------------------------------
+
+    reg {
+        regwidth = 32;
+        buffer_reads;
+        default sw = r;
+        default hw = w;
+
+        // ensure the various VHDL types (signed, ufixed, etc.) work with
+        // multi- and single-bit fields, as well as different field access types
+
+        // first word is treated separately to implement a read pass-through
+        field {is_signed; sw=rw; }        f1[1];
+        field {is_signed; }               f2[1];
+        field {is_signed; }               f3[6];
+
+        field {fracwidth=1; sw=rw; we; }  f4[8] = 111;
+        field {fracwidth=1; hw=r; }       f5[8] = 222;
+        field {is_signed; }               f6[1];
+        field {fracwidth=1; sw=rw; wel; } f7[1] = 0;
+        field {fracwidth=1; hw=r; }       f8[1] = 1;
+    } reg_fp;
 };

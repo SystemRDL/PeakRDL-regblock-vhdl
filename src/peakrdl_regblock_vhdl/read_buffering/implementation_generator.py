@@ -4,6 +4,8 @@ from systemrdl.component import Reg
 from systemrdl.node import RegNode
 
 from ..forloop_generator import RDLForLoopGenerator
+from ..utils import do_bitswap, get_vhdl_type
+from ..vhdl_int import VhdlInt
 
 if TYPE_CHECKING:
     from . import ReadBuffering
@@ -42,13 +44,23 @@ class RBufLogicGenerator(RDLForLoopGenerator):
                 s.append(f"{data}({field.low-1} downto {bidx}) <= (others => '0');")
 
             value = self.exp.dereferencer.get_value(field)
+            if self.exp.hwif.has_value_input(field) and not field.implements_storage:
+                # the value is a hwif input, which may not be a std_logic_vector, convert it
+                if get_vhdl_type(field) != "std_logic_vector":
+                    value = f"to_std_logic_vector({value})"
+            elif field.implements_storage:
+                # the value is in field storage, which may be a std_logic
+                if field.width == 1:
+                    value = f"to_std_logic_vector({value})"
+            elif isinstance(value, VhdlInt):
+                # the value is a constant, ensure it's not reduced to a std_logic
+                value.allow_std_logic = False
+
             if field.msb < field.lsb:
                 # Field gets bitswapped since it is in [low:high] orientation
-                value = f"bitswap({value})"
-            if field.high == field.low:
-                s.append(f"{data}({field.high}) <= {value};")
-            else:
-                s.append(f"{data}({field.high} downto {field.low}) <= {value};")
+                value = do_bitswap(value)
+
+            s.append(f"{data}({field.high} downto {field.low}) <= {value};")
 
             bidx = field.high + 1
 

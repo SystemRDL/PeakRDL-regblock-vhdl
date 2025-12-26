@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, List
 
 from .bases import NextStateConditional, NextStateUnconditional
+from ..utils import get_vhdl_type
 
 if TYPE_CHECKING:
     from systemrdl.node import FieldNode
@@ -23,7 +24,12 @@ class AlwaysWrite(NextStateUnconditional):
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         hwmask = field.get_property('hwmask')
         hwenable = field.get_property('hwenable')
-        I = str(self.exp.hwif.get_input_identifier(field))
+        I = self.exp.hwif.get_input_identifier(field)
+        vhdl_type = get_vhdl_type(field)
+        if field.width == 1 and vhdl_type != "std_logic":
+            I = f"to_std_logic({I})"
+        if field.width > 1 and vhdl_type != "std_logic_vector":
+            I = f"to_std_logic_vector({I})"
         R = self.exp.field_logic.get_storage_identifier(field)
         if hwmask is not None:
             M = self.exp.dereferencer.get_value(hwmask)
@@ -32,7 +38,7 @@ class AlwaysWrite(NextStateUnconditional):
             E = self.exp.dereferencer.get_value(hwenable)
             next_val = f"({I} and {E}) or ({R} and not {E})"
         else:
-            next_val = I
+            next_val = str(I)
 
         return [
             f"next_c := {next_val};",
@@ -44,7 +50,12 @@ class _QualifiedWrite(NextStateConditional):
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         hwmask = field.get_property('hwmask')
         hwenable = field.get_property('hwenable')
-        I = str(self.exp.hwif.get_input_identifier(field))
+        I = self.exp.hwif.get_input_identifier(field)
+        vhdl_type = get_vhdl_type(field)
+        if field.width == 1 and vhdl_type != "std_logic":
+            I = f"to_std_logic({I})"
+        if field.width > 1 and vhdl_type != "std_logic_vector":
+            I = f"to_std_logic_vector({I})"
         R = self.exp.field_logic.get_storage_identifier(field)
         if hwmask is not None:
             M = self.exp.dereferencer.get_value(hwmask)
@@ -53,7 +64,7 @@ class _QualifiedWrite(NextStateConditional):
             E = self.exp.dereferencer.get_value(hwenable)
             next_val = f"({I} and {E}) or ({R} and not {E})"
         else:
-            next_val = I
+            next_val = str(I)
 
         return [
             f"next_c := {next_val};",
