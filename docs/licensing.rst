@@ -35,7 +35,7 @@ The following are exempt and are free to use with no restrictions:
 *   Any code snippets in this documentation can be freely copy/pasted. These are
     examples that are intended for this purpose.
 *   All reference files that are downloadable from this documentation, which are
-    also available in the `hdl-src folder in the repository <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/tree/main/hdl-src>`_
+    also available in the `hdl_src folder in the repository <https://github.com/SystemRDL/PeakRDL-regblock-vhdl/tree/main/src/peakrdl_regblock_vhdl/hdl_src>`_
 
 
 Can I use this as part of my company's internally developed tools?

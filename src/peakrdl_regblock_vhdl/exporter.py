@@ -3,6 +3,7 @@ import shutil
 from typing import TYPE_CHECKING, Union, Any, Type, Optional, Set, List
 from collections import OrderedDict
 
+import importlib_resources as resources
 import jinja2 as jj
 from systemrdl.node import AddrmapNode, RootNode
 
@@ -205,10 +206,13 @@ class RegblockExporter:
         stream.dump(module_file_path)
 
         if self.ds.copy_utils_pkg:
-            shutil.copyfile(
-                os.path.join(os.path.dirname(__file__), "..", "..", "hdl-src", "reg_utils.vhd"),
-                os.path.join(output_dir, "reg_utils.vhd")
-            )
+            with resources.as_file(
+                resources.files('peakrdl_regblock_vhdl.hdl_src').joinpath('reg_utils.vhd')
+            ) as src_pkg:
+                shutil.copyfile(
+                    src_pkg,
+                    os.path.join(output_dir, "reg_utils.vhd")
+                )
 
         if hwif_report_file:
             hwif_report_file.close()
