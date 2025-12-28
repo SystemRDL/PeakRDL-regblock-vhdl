@@ -2,63 +2,88 @@ addrmap top {
     default regwidth = 8;
 
     // All the valid combinations from Table 12
+    // Test multi-bit and single-bit fields
     reg {
-        field {
-            sw=rw; hw=rw; we; // Storage element
-        } f[8] = 10;
+        // Storage element
+        default sw=rw;
+        default hw=rw;
+        default we;
+        field {} f1[7] = 10;
+        field {} f2[1] = 0;
     } r1;
 
     reg {
-        field {
-            sw=rw; hw=r; // Storage element
-        } f[8] = 20;
+        // Storage element
+        default sw=rw;
+        default hw=r;
+        field {} f1[7] = 20;
+        field {} f2[1] = 1;
     } r2;
 
     reg {
-        field {
-            sw=rw; hw=w; wel; // Storage element
-        } f[8] = 30;
+        // Storage element
+        default sw=rw;
+        default hw=w;
+        default wel;
+        field {} f1[7] = 30;
+        field {} f2[1] = 0;
     } r3;
 
     reg {
-        field {
-            sw=rw; hw=na; // Storage element
-        } f[8] = 40;
+        // Storage element
+        default sw=rw;
+        default hw=na;
+        field {} f1[7] = 40;
+        field {} f2[1] = 1;
     } r4;
 
     reg {
-        field {
-            sw=r; hw=rw; we; // Storage element
-        } f[8] = 50;
+        // Storage element
+        default sw=r;
+        default hw=rw;
+        default we;
+        field {} f1[7] = 50;
+        field {} f2[1] = 0;
     } r5;
 
     reg {
-        field {
-            sw=r; hw=r; // Wire/Bus - constant value
-        } f[8] = 60;
+        // Wire/Bus - constant value
+        default sw=r;
+        default hw=r;
+        field {} f1[7] = 60;
+        field {} f2[1] = 1;
     } r6;
 
     reg {
-        field {
-            sw=r; hw=w; // Wire/Bus - hardware assigns value
-        } f[8];
+        // Wire/Bus - hardware assigns value
+        default sw=r;
+        default hw=w;
+        field {} f1[7];
+        field {} f2[1];
     } r7;
 
     reg {
-        field {
-            sw=r; hw=na; // Wire/Bus - constant value
-        } f[8] = 80;
+        // Wire/Bus - constant value
+        default sw=r;
+        default hw=na;
+        field {} f1[7] = 80;
+        field {} f2[1] = 0;
     } r8;
 
     reg {
-        field {
-            sw=w; hw=rw; we; // Storage element
-        } f[8] = 90;
+        // Storage element
+        default sw=w;
+        default hw=rw;
+        default we;
+        field {} f1[7] = 90;
+        field {} f2[1] = 1;
     } r9;
 
     reg {
-        field {
-            sw=w; hw=r; // Storage element
-        } f[8] = 100;
+        // Storage element
+        default sw=w;
+        default hw=r;
+        field {} f1[7] = 100;
+        field {} f2[1] = 0;
     } r10;
 };
