@@ -11,6 +11,11 @@ All field inputs and outputs as well as signals are consolidated into these
 record ports. The presence of each depends on the specific contents of the design
 being exported.
 
+If desired, empty ports can be forced using ``force_hwif_in`` and
+``force_hwif_out`` exporter options. When a side is forced and would otherwise
+be empty, a reserved placeholder member ``\0_dummy_entry\`` is generated to
+keep the VHDL record type legal.
+
 
 Using records for the hardware interface has the following benefits:
 

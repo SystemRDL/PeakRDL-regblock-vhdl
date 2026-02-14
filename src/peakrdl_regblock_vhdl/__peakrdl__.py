@@ -25,6 +25,8 @@ class Exporter(ExporterSubcommandPlugin):
         "err_if_bad_addr": schema.Boolean(),
         "err_if_bad_rw": schema.Boolean(),
         "copy_utils_pkg": schema.Boolean(),
+        "force_hwif_in": schema.Boolean(),
+        "force_hwif_out": schema.Boolean(),
     }
 
     @functools.lru_cache()
@@ -168,6 +170,18 @@ class Exporter(ExporterSubcommandPlugin):
             default=False,
             help="Copy the reg_utils.vhd package into the output directory."
         )
+        arg_group.add_argument(
+            "--force-hwif-in",
+            action="store_true",
+            default=False,
+            help="Force generation of hwif_in port and type, even if inferred empty."
+        )
+        arg_group.add_argument(
+            "--force-hwif-out",
+            action="store_true",
+            default=False,
+            help="Force generation of hwif_out port and type, even if inferred empty."
+        )
 
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         cpuifs = self.get_cpuifs()
@@ -234,4 +248,6 @@ class Exporter(ExporterSubcommandPlugin):
             err_if_bad_rw=options.err_if_bad_rw or self.cfg['err_if_bad_rw'],
             copy_utils_pkg=options.copy_utils_pkg,
             default_reset_async=default_reset_async,
+            force_hwif_in=options.force_hwif_in or self.cfg['force_hwif_in'],
+            force_hwif_out=options.force_hwif_out or self.cfg['force_hwif_out'],
         )

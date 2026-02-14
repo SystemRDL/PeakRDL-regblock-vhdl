@@ -115,6 +115,9 @@ architecture rtl of {{ds.module_name}} is
     {{ readback.signal_declaration | indent }}
 
 begin
+{%- if hwif.output_needs_dummy_member %}
+    hwif_out.\0_dummy_entry\ <= '0';
+{%- endif %}
 
     ----------------------------------------------------------------------------
     -- CPU Bus interface

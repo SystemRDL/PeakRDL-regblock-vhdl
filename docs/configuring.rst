@@ -53,3 +53,13 @@ All VHDL regblock-specific options are defined under the ``[regblock-vhdl]`` TOM
 
     If set to true, generate CPUIF error response if an illegal access is
     performed to a read-only or write-only register.
+
+.. data:: force_hwif_in
+
+    If set to true, force generation of the ``hwif_in`` port and corresponding
+    type even when no hardware input members are inferred.
+
+.. data:: force_hwif_out
+
+    If set to true, force generation of the ``hwif_out`` port and corresponding
+    type even when no hardware output members are inferred.

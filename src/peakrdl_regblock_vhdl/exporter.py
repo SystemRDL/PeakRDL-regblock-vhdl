@@ -130,6 +130,12 @@ class RegblockExporter:
             AXI4LITE.*RESP = 2'b10.
         copy_utils_pkg: bool
             If overridden to True, copy the reg_utils.vhd package into the output directory.
+        force_hwif_in: bool
+            If overridden to True, force generation of ``hwif_in`` even when no
+            inferred hardware input signals exist.
+        force_hwif_out: bool
+            If overridden to True, force generation of ``hwif_out`` even when no
+            inferred hardware output signals exist.
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -295,6 +301,8 @@ class DesignState:
 
         # General exporter options
         self.copy_utils_pkg = kwargs.pop("copy_utils_pkg", False) # type: bool
+        self.force_hwif_in = kwargs.pop("force_hwif_in", False) # type: bool
+        self.force_hwif_out = kwargs.pop("force_hwif_out", False) # type: bool
 
         #------------------------
         # Info about the design

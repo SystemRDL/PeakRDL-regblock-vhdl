@@ -30,6 +30,8 @@ class Hwif:
 
         self.has_input_struct = False
         self.has_output_struct = False
+        self.input_needs_dummy_member = False
+        self.output_needs_dummy_member = False
 
         self.hwif_report_file = hwif_report_file
 
@@ -39,6 +41,8 @@ class Hwif:
         else:
             self._gen_in_cls = InputStructGenerator_TypeScope
             self._gen_out_cls = OutputStructGenerator_TypeScope
+
+    DUMMY_MEMBER_NAME = "\\0_dummy_entry\\"
 
     @property
     def ds(self) -> 'DesignState':
@@ -79,9 +83,16 @@ class Hwif:
         )
         if structs_in is not None:
             self.has_input_struct = True
+            self.input_needs_dummy_member = False
             lines.append(structs_in)
         else:
-            self.has_input_struct = False
+            if self.ds.force_hwif_in:
+                self.has_input_struct = True
+                self.input_needs_dummy_member = True
+                lines.append(self._forced_empty_struct(f"{self.top_node.inst_name}_in_t"))
+            else:
+                self.has_input_struct = False
+                self.input_needs_dummy_member = False
 
         gen_out = self._gen_out_cls(self)
         structs_out = gen_out.get_struct(
@@ -90,9 +101,16 @@ class Hwif:
         )
         if structs_out is not None:
             self.has_output_struct = True
+            self.output_needs_dummy_member = False
             lines.append(structs_out)
         else:
-            self.has_output_struct = False
+            if self.ds.force_hwif_out:
+                self.has_output_struct = True
+                self.output_needs_dummy_member = True
+                lines.append(self._forced_empty_struct(f"{self.top_node.inst_name}_out_t"))
+            else:
+                self.has_output_struct = False
+                self.output_needs_dummy_member = False
 
         gen_enum = EnumGenerator()
         enums = gen_enum.get_enums(self.ds.user_enums)
@@ -111,12 +129,25 @@ class Hwif:
         lines = []
         if self.has_input_struct:
             type_name = f"{self.top_node.inst_name}_in_t"
-            lines.append(f"hwif_in : in {type_name}")
+            if self.input_needs_dummy_member:
+                lines.append(
+                    "hwif_in : in "
+                    f"{type_name} := ({self.DUMMY_MEMBER_NAME} => '0')"
+                )
+            else:
+                lines.append(f"hwif_in : in {type_name}")
         if self.has_output_struct:
             type_name = f"{self.top_node.inst_name}_out_t"
             lines.append(f"hwif_out : out {type_name}")
 
         return ";\n".join(lines)
+
+    def _forced_empty_struct(self, type_name: str) -> str:
+        return (
+            f"type {type_name} is record\n"
+            f"    {self.DUMMY_MEMBER_NAME} : std_logic;\n"
+            "end record;"
+        )
 
     #---------------------------------------------------------------------------
     # hwif utility functions

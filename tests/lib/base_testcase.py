@@ -43,6 +43,8 @@ class BaseTestCase(unittest.TestCase):
     default_reset_async = False
     err_if_bad_addr = False
     err_if_bad_rw = False
+    force_hwif_in = False
+    force_hwif_out = False
 
     #: this gets auto-loaded via the _load_request autouse fixture
     request = None # type: pytest.FixtureRequest
@@ -110,7 +112,16 @@ class BaseTestCase(unittest.TestCase):
 
         for lang, exporter, cpuif_cls, kwargs in (
             ("", self.sv_exporter, self.cpuif.sv_cpuif_cls, {}),
-            ("vhdl_", self.vhdl_exporter, self.cpuif.vhdl_cpuif_cls, {"copy_utils_pkg": True}),
+            (
+                "vhdl_",
+                self.vhdl_exporter,
+                self.cpuif.vhdl_cpuif_cls,
+                {
+                    "copy_utils_pkg": True,
+                    "force_hwif_in": self.force_hwif_in,
+                    "force_hwif_out": self.force_hwif_out,
+                }
+            ),
         ):
             exporter.export(
                 root,
