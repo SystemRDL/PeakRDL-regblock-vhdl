@@ -7,12 +7,14 @@ PARAMS = get_permutations({
     "n_regs" : [1, 2],
     "regwidth" : [8, 16],
     "name" : ["hello", "world"],
+    "swacc" : [True, False],
 })
 @parameterized_class(PARAMS)
-class TestRetimedFanin(SimTestCase):
+class TestPkgParams(SimTestCase):
     n_regs = 20
     regwidth = 32
     name = "xyz"
+    swacc = False
 
     @classmethod
     def setUpClass(cls):
@@ -20,6 +22,7 @@ class TestRetimedFanin(SimTestCase):
             "N_REGS": cls.n_regs,
             "REGWIDTH": cls.regwidth,
             "NAME": f'"{cls.name}"',
+            "SWACC": cls.swacc,
         }
         super().setUpClass()
 

@@ -1,10 +1,12 @@
 addrmap top #(
     longint N_REGS = 1,
     longint REGWIDTH = 32,
-    string NAME = "abcd"
+    string NAME = "abcd",
+    boolean SWACC = true
 ) {
     reg reg_t {
         regwidth = REGWIDTH;
+        default swacc = SWACC;
         field {sw=rw; hw=r;} f[REGWIDTH] = 1;
     };
     reg_t regs[N_REGS];

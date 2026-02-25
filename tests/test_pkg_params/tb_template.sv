@@ -5,4 +5,5 @@
     assert(regblock_pkg::N_REGS == {{testcase.n_regs}});
     assert(regblock_pkg::REGWIDTH == {{testcase.regwidth}});
     assert(regblock_pkg::NAME == "{{testcase.name}}");
+    // TODO: would like to test SWACC here, but SV doesn't have boolean type
 {% endblock %}

@@ -54,7 +54,11 @@ class Hwif:
 
         for param in self.top_node.inst.parameters:
             value = param.get_value()
-            if isinstance(value, int):
+            if isinstance(value, bool):
+                lines.append(
+                    f"constant {param.name} : boolean := {value};"
+                )
+            elif isinstance(value, int):
                 lines.append(
                     f"constant {param.name} : integer := {value};"
                 )
