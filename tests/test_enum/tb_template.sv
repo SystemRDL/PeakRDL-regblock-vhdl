@@ -9,6 +9,7 @@
     // check enum values
     assert(regblock_pkg::top__my_enum__val_1 == 'd3);
     assert(regblock_pkg::top__my_enum__val_2 == 'd4);
+    assert(regblock_pkg::top__my_enum__val_3 == 'd11);
 
     // check initial conditions
     cpuif.assert_read('h0, regblock_pkg::top__my_enum__val_2);

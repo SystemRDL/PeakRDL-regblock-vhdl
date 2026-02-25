@@ -307,10 +307,10 @@ class EnumGenerator:
         if max_value.bit_length() == 1:
             datatype = "std_logic := '{0}'"
         else:
-            datatype = f'std_logic_vector({max_value.bit_length() - 1} downto 0) := {max_value.bit_length()}x"{{0}}"'
+            datatype = f'std_logic_vector({max_value.bit_length() - 1} downto 0) := {max_value.bit_length()}x"{{0:X}}"'
 
         for enum_member in user_enum:
             constname = kwf(f"{prefix}.{enum_member.name}")
-            lines.append(f"constant {constname} : {datatype.format(enum_member.value,'x')};")
+            lines.append(f"constant {constname} : {datatype.format(enum_member.value)};")
 
         return "\n".join(lines)
