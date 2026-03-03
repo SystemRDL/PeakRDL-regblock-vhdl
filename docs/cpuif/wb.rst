@@ -1,0 +1,27 @@
+Wishbone Bus
+============
+
+Implements the register block using an
+`Wishbone B4 <https://en.wikipedia.org/wiki/Wishbone_(computer_bus)>`
+CPU interface.
+
+The wishbone interface comes in two i/o port flavors:
+
+VHDL Record Interface
+    * Command line: ``--cpuif wishbone``
+    * Interface Definition: :download:`wb_intf_pkg.vhd <../../hdl-src/wb_intf_pkg.vhd>`
+    * Class: :class:`peakrdl_regblock_vhdl.cpuif.wb.wb_Cpuif`
+
+Flattened inputs/outputs
+    Flattens the interface into discrete input and output ports.
+
+    * Command line: ``--cpuif wishbone-flat``
+    * Class: :class:`peakrdl_regblock_vhdl.cpuif.wb.wb_Cpuif_flattened`
+
+
+Implementation Details
+----------------------
+This implementation of the Wishbone protocol has the following features:
+- Classic Wishbone Operaions (SINGLE_READ and SINGLE_WRITE)
+- Stall and Error optional output signals
+
