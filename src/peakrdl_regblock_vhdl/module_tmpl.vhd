@@ -45,7 +45,6 @@ architecture rtl of {{ds.module_name}} is
     {{cpuif.signal_declaration | indent}}
 
 {%- if ds.has_external_addressable %}
-    signal external_req : std_logic;
     signal external_pending : std_logic;
     signal external_wr_ack : std_logic;
     signal external_rd_ack : std_logic;
@@ -64,11 +63,9 @@ architecture rtl of {{ds.module_name}} is
     signal decoded_reg_strb : decoded_reg_strb_t;
     signal decoded_err : std_logic;
 {%- if ds.has_external_addressable %}
-    signal decoded_strb_is_external : std_logic;
+    signal decoded_req_is_external : std_logic;
 {% endif %}
-{%- if ds.has_external_block %}
     signal decoded_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
-{% endif %}
     signal decoded_req : std_logic;
     signal decoded_req_is_wr : std_logic;
     signal decoded_wr_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
@@ -105,15 +102,47 @@ architecture rtl of {{ds.module_name}} is
     ----------------------------------------------------------------------------
     -- Readback Signals
     ----------------------------------------------------------------------------
+    signal rd_mux_addr : unsigned({{cpuif.addr_width-1}} downto 0);
     {%- if ds.has_external_addressable %}
+    signal pending_rd_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
     signal readback_external_rd_ack_c : std_logic;
     signal readback_external_rd_ack : std_logic;
     {%- endif %}
     signal readback_err : std_logic;
     signal readback_done : std_logic;
     signal readback_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
-    {{ readback.signal_declaration | indent }}
 
+    {%- if ds.retime_read_fanin %}
+    type readback_data_array_t is array (0 to {{2 ** high_addr_width - 1}}) of std_logic_vector({{cpuif.data_width-1}} downto 0);
+    constant READBACK_DATA_ARRAY_ZEROS : readback_data_array_t := (0 to {{2 ** high_addr_width - 1}} => std_logic_vector'(0 to {{cpuif.data_width-1}} => '0'));
+    signal readback_data_rt_c : readback_data_array_t;
+    signal readback_data_rt : readback_data_array_t;
+    signal readback_done_rt : std_logic;
+    signal readback_err_rt : std_logic;
+    signal readback_addr_rt : unsigned({{ds.addr_width-1}} downto 0);
+    {%- if ds.has_external_block %}
+    signal readback_ext_block_data_rt_c : std_logic_vector({{cpuif.data_width-1}} downto 0);
+    signal readback_ext_block_data_rt : std_logic_vector({{cpuif.data_width-1}} downto 0);
+    signal readback_is_ext_block_c : std_logic;
+    signal readback_is_ext_block : std_logic;
+    {%- endif %}
+    function ad_low(addr: unsigned({{ds.addr_width-1}} downto 0)) return unsigned is
+    begin
+        return addr({{low_addr_width-1}} downto 0);
+    end function;
+    function ad_low(addr: natural) return natural is
+    begin
+        return to_integer(ad_low(to_unsigned(addr, {{ds.addr_width}})));
+    end function;
+    function ad_hi(addr: unsigned({{ds.addr_width-1}} downto 0)) return unsigned is
+    begin
+        return addr({{ds.addr_width-1}} downto {{low_addr_width}});
+    end function;
+    function ad_hi(addr: natural) return natural is
+    begin
+        return to_integer(ad_hi(to_unsigned(addr, {{ds.addr_width}})));
+    end function;
+    {%- endif %}
 begin
 
     ----------------------------------------------------------------------------
@@ -121,29 +150,6 @@ begin
     ----------------------------------------------------------------------------
     {{cpuif.get_implementation() | indent}}
 
-{%- if ds.has_external_addressable %}
-    process({{get_always_ff_event(cpuif.reset)}}) begin
-        if {{get_resetsignal(cpuif.reset, asynch=True)}} then -- async reset
-            external_pending <= '0';
-        elsif rising_edge(clk) then
-            if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
-                external_pending <= '0';
-            else
-                if external_req and not external_wr_ack and not external_rd_ack then
-                    external_pending <= '1';
-                elsif external_wr_ack or external_rd_ack then
-                    external_pending <= '0';
-                end if;
-                --pragma translate_off
-                assert_bad_ext_wr_ack: assert not external_wr_ack or (external_pending or external_req)
-                    report "An external wr_ack strobe was asserted when no external request was active";
-                assert_bad_ext_rd_ack: assert not external_rd_ack or (external_pending or external_req)
-                    report "An external rd_ack strobe was asserted when no external request was active";
-                --pragma translate_on
-            end if;
-        end if;
-    end process;
-{%- endif %}
 {% if ds.min_read_latency == ds.min_write_latency %}
     -- Read & write latencies are balanced. Stalls not required
     {%- if ds.has_external_addressable %}
@@ -215,7 +221,7 @@ begin
             return result;
         end;
         variable is_valid_addr : std_logic;
-        variable is_invalid_rw : std_logic;
+        variable is_valid_rw : std_logic;
         {%- if ds.has_external_addressable %}
         variable is_external : std_logic;
         {%- endif %}
@@ -223,25 +229,58 @@ begin
     {%- if ds.has_external_addressable %}
         is_external := '0';
     {%- endif %}
-    {%- if ds.err_if_bad_addr %}
+    {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
         is_valid_addr := '0';
     {%- else %}
-        is_valid_addr := '1'; -- No error checking on valid address access
+        is_valid_addr := '1'; -- No valid address check
     {%- endif %}
-        is_invalid_rw := '0';
+    {%- if ds.err_if_bad_rw %}
+        is_valid_rw := '0';
+    {%- else %}
+        is_valid_rw := '1'; -- No valid RW check
+    {%- endif %}
         {{address_decode.get_implementation()|indent(8)}}
-        decoded_err <= (not is_valid_addr or is_invalid_rw) and decoded_req;
+    {%- if ds.err_if_bad_addr and ds.err_if_bad_rw %}
+        decoded_err <= (not is_valid_addr or (is_valid_addr and not is_valid_rw)) and decoded_req;
+    {%- elif ds.err_if_bad_addr %}
+        decoded_err <= not is_valid_addr and decoded_req;
+    {%- elif ds.err_if_bad_rw %}
+        decoded_err <= (is_valid_addr and not is_valid_rw) and decoded_req;
+    {%- else %}
+        decoded_err <= '0';
+    {%- endif %}
     {%- if ds.has_external_addressable %}
-        decoded_strb_is_external <= is_external;
-        external_req <= is_external;
+        decoded_req_is_external <= is_external;
     {%- endif %}
     end process;
 
+{%- if ds.has_external_addressable %}
+    process({{get_always_ff_event(cpuif.reset)}}) begin
+        if {{get_resetsignal(cpuif.reset, asynch=True)}} then -- async reset
+            external_pending <= '0';
+        elsif rising_edge(clk) then
+            if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
+                external_pending <= '0';
+            else
+                if decoded_req_is_external and not external_wr_ack and not external_rd_ack then
+                    external_pending <= '1';
+                elsif external_wr_ack or external_rd_ack then
+                    external_pending <= '0';
+                end if;
+                --pragma translate_off
+                assert_bad_ext_wr_ack: assert not external_wr_ack or (external_pending or decoded_req_is_external)
+                    report "An external wr_ack strobe was asserted when no external request was active";
+                assert_bad_ext_rd_ack: assert not external_rd_ack or (external_pending or decoded_req_is_external)
+                    report "An external rd_ack strobe was asserted when no external request was active";
+                --pragma translate_on
+            end if;
+        end if;
+    end process;
+{%- endif %}
+
     -- Pass down signals to next stage
     process(all) begin
-    {%- if ds.has_external_block %}
         decoded_addr <= cpuif_addr;
-    {%- endif %}
         decoded_req <= cpuif_req_masked;
         decoded_req_is_wr <= cpuif_req_is_wr;
         decoded_wr_data <= cpuif_wr_data;
@@ -308,7 +347,7 @@ begin
         {{ext_write_acks.get_implementation()|indent(8)}}
         external_wr_ack <= wr_ack;
     end process;
-    cpuif_wr_ack <= external_wr_ack or (decoded_req and decoded_req_is_wr and not decoded_strb_is_external);
+    cpuif_wr_ack <= external_wr_ack or (decoded_req and decoded_req_is_wr and not decoded_req_is_external);
 {%- else %}
     cpuif_wr_ack <= decoded_req and decoded_req_is_wr;
 {%- endif %}
@@ -350,6 +389,27 @@ begin
     {%- endif %}
 {%- endif %}
 
+{%- if ds.has_external_addressable %}
+    -- Hold read mux address to guarantee it is stable throughout any external accesses
+    process({{get_always_ff_event(cpuif.reset)}}) begin
+        if {{get_resetsignal(cpuif.reset, asynch=True)}} then -- async reset
+            pending_rd_addr <= (others => '0');
+        elsif rising_edge(clk) then
+            if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
+                pending_rd_addr <= (others => '0');
+            else
+                if decoded_req then
+                    pending_rd_addr <= decoded_addr;
+                end if;
+            end if;
+        end if;
+    end process;
+    rd_mux_addr <= unsigned(decoded_addr) when decoded_req = '1' else unsigned(pending_rd_addr);
+{%- else %}
+    rd_mux_addr <= unsigned(decoded_addr);
+{%- endif %}
+
+    {{readback_implementation|indent}}
 {%- macro readback_retime_reset() %}
         cpuif_rd_ack <= '0';
         cpuif_rd_data <= (others => '0');
@@ -358,7 +418,6 @@ begin
         external_rd_ack <= '0';
         {%- endif %}
 {%- endmacro %}
-{{readback.get_implementation()|indent}}
 {% if ds.retime_read_response %}
     process({{get_always_ff_event(cpuif.reset)}}) begin
         if {{get_resetsignal(cpuif.reset, asynch=True)}} then -- async reset

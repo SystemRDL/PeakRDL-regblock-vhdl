@@ -89,6 +89,7 @@ class BaseTestCase(unittest.TestCase):
         Call the peakrdl_regblock exporter to generate the DUT
         """
         this_dir = self.get_testcase_dir()
+        print(f"Test directory: {this_dir}")
 
         if self.rdl_file:
             rdl_file = os.path.join(this_dir, self.rdl_file)

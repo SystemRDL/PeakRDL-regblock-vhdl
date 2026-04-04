@@ -22,7 +22,7 @@ process({{get_always_ff_event(cpuif.reset)}}) begin
             {%- for segment in segments %}
             if {{segment.strobe}} and decoded_req_is_wr then
                 {{wbuf_prefix}}.pending <= '1';
-                {%- if node.inst.is_msb0_order %}
+                {%- if node.is_msb0_order %}
                 {{wbuf_prefix}}.data{{segment.bslice}} <= ({{wbuf_prefix}}.data{{segment.bslice}} and not decoded_wr_biten_bswap) or (decoded_wr_data_bswap and decoded_wr_biten_bswap);
                 {{wbuf_prefix}}.biten{{segment.bslice}} <= {{wbuf_prefix}}.biten{{segment.bslice}} or decoded_wr_biten_bswap;
                 {%- else %}

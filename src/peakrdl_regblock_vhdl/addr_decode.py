@@ -146,31 +146,35 @@ class DecodeLogicGenerator(RDLForLoopGenerator):
         self._array_stride_stack = [] # type: List[int]
 
     def _add_addressablenode_decoding_flags(self, node: 'AddressableNode') -> None:
-        addr_str = self._get_address_str(node)
-        addr_decoding_str = f"cpuif_req_masked and to_std_logic(to_unsigned(cpuif_addr) >= {addr_str} and to_unsigned(cpuif_addr) <= {addr_str} + {VhdlInt.integer_hex(node.size - 1)})"
+        addr_lo = self._get_address_str(node)
+        addr_hi = f"{addr_lo} + {VhdlInt.integer_hex(node.size - 1)}"
+        addr_decoding_str = f"cpuif_req_masked and to_std_logic(to_unsigned(cpuif_addr) >= {addr_lo} and to_unsigned(cpuif_addr) <= {addr_hi})"
         rhs = addr_decoding_str
         rhs_valid_addr = addr_decoding_str
         if isinstance(node, MemNode):
             readable = node.is_sw_readable
             writable = node.is_sw_writable
             if readable and writable:
-                rhs_invalid_rw = "'0'"
+                pass
             elif readable and not writable:
                 rhs = f"{addr_decoding_str} and not cpuif_req_is_wr"
-                rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_is_wr"
             elif not readable and writable:
                 rhs = f"{addr_decoding_str} and cpuif_req_is_wr"
-                rhs_invalid_rw = f"{addr_decoding_str} and not cpuif_req_is_wr"
             else:
                 raise RuntimeError
         # Add decoding flags
         self.add_content(f"{self.addr_decode.get_external_block_access_strobe(node)} <= {rhs};")
         self.add_content(f"is_external := is_external or ({rhs});")
-        if self.addr_decode.exp.ds.err_if_bad_addr:
+        # Also assign is_valid_adddr when err_if_bad_rw is set so that it can be used to catch
+        # invalid RW accesses on existing registers only.
+        if self.addr_decode.exp.ds.err_if_bad_addr or self.addr_decode.exp.ds.err_if_bad_rw:
             self.add_content(f"is_valid_addr := is_valid_addr or ({rhs_valid_addr});")
         if isinstance(node, MemNode):
             if self.addr_decode.exp.ds.err_if_bad_rw:
-                self.add_content(f"is_invalid_rw := is_invalid_rw or ({rhs_invalid_rw});")
+                self.add_content(f"is_valid_rw := is_valid_rw or ({rhs});")
+        else:
+            # For external register blocks, all accesses are valid RW
+            self.add_content(f"is_valid_rw := is_valid_rw or ({rhs_valid_addr});")
 
 
     def enter_AddressableComponent(self, node: 'AddressableNode') -> Optional[WalkerAction]:
@@ -217,13 +221,10 @@ class DecodeLogicGenerator(RDLForLoopGenerator):
         writable = node.has_sw_writable
         if readable and writable:
             rhs = addr_decoding_str
-            rhs_invalid_rw = "'0'"
         elif readable and not writable:
             rhs = f"{addr_decoding_str} and not cpuif_req_is_wr"
-            rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_is_wr"
         elif not readable and writable:
             rhs = f"{addr_decoding_str} and cpuif_req_is_wr"
-            rhs_invalid_rw = f"{addr_decoding_str} and not cpuif_req_is_wr"
         else:
             raise RuntimeError
         # Add decoding flags
@@ -233,10 +234,12 @@ class DecodeLogicGenerator(RDLForLoopGenerator):
             self.add_content(f"{self.addr_decode.get_access_strobe(node)}({subword_index}) <= {rhs};")
         if node.external:
             self.add_content(f"is_external := is_external or ({rhs});")
-        if self.addr_decode.exp.ds.err_if_bad_addr:
+        # Also assign is_valid_adddr when err_if_bad_rw is set so that it can be used to catch
+        # invalid RW accesses on existing registers only.
+        if self.addr_decode.exp.ds.err_if_bad_addr or self.addr_decode.exp.ds.err_if_bad_rw:
             self.add_content(f"is_valid_addr := is_valid_addr or ({rhs_valid_addr});")
         if self.addr_decode.exp.ds.err_if_bad_rw:
-            self.add_content(f"is_invalid_rw := is_invalid_rw or ({rhs_invalid_rw});")
+            self.add_content(f"is_valid_rw := is_valid_rw or ({rhs});")
 
     def enter_Reg(self, node: RegNode) -> None:
         regwidth = node.get_property('regwidth')

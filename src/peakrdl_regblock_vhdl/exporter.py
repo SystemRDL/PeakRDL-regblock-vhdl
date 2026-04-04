@@ -155,15 +155,12 @@ class RegblockExporter:
         # Construct exporter components
         self.cpuif = cpuif_cls(self)
         self.hwif = Hwif(self, hwif_report_file=hwif_report_file)
+        self.readback = Readback(self)
         self.address_decode = AddressDecode(self)
         self.field_logic = FieldLogic(self)
         self.write_buffering = WriteBuffering(self)
         self.read_buffering = ReadBuffering(self)
         self.dereferencer = Dereferencer(self)
-        # Construct readback last.
-        # Readback has the capability to disable retiming if the fanin is tiny.
-        # This is done at initialization and requires knowledge of the rest of the design.
-        self.readback = Readback(self)
         ext_write_acks = ExternalWriteAckGenerator(self)
         ext_read_acks = ExternalReadAckGenerator(self)
         parity = ParityErrorReduceGenerator(self)
@@ -184,7 +181,9 @@ class RegblockExporter:
             "default_resetsignal_name": self.dereferencer.default_resetsignal_name,
             "address_decode": self.address_decode,
             "field_logic": self.field_logic,
-            "readback": self.readback,
+            "readback_implementation": self.readback.get_implementation(),
+            "low_addr_width": self.readback.low_addr_width,
+            "high_addr_width": self.readback.high_addr_width,
             "ext_write_acks": ext_write_acks,
             "ext_read_acks": ext_read_acks,
             "parity": parity,
@@ -326,9 +325,13 @@ class DesignState:
             # Assume 32-bits
             msg.warning(
                 "Addrmap being exported only contains external components. Unable to infer the CPUIF bus width. Assuming 32-bits.",
-                self.top_node.inst.def_src_ref
+                self.top_node.def_src_ref
             )
             self.cpuif_data_width = 32
+
+            # Also, to avoid silly edge cases, disable read fanin retiming since
+            # it has little benefit anyways
+            self.retime_read_fanin = False
 
         #------------------------
         # Min address width encloses the total size AND at least 1 useful address bit
@@ -338,6 +341,15 @@ class DesignState:
             if user_addr_width < self.addr_width:
                 msg.fatal(f"User-specified address width shall be greater than or equal to {self.addr_width}.")
             self.addr_width = user_addr_width
+
+        if self.retime_read_fanin:
+            # Check if address width is sufficient to even bother with read fanin retiming
+            data_width_bytes = self.cpuif_data_width // 8
+            unused_low_addr_bits = clog2(data_width_bytes)
+            relevant_addr_width = self.addr_width - unused_low_addr_bits
+            if relevant_addr_width < 2:
+                # Unable to partition the address space. Disable retiming
+                self.retime_read_fanin = False
 
     @property
     def min_read_latency(self) -> int:

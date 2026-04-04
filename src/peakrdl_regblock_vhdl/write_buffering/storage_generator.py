@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
-from systemrdl.node import FieldNode, RegNode
+from systemrdl.node import FieldNode, RegNode, AddressableNode
+from systemrdl.walker import WalkerAction
 
 from ..struct_generator import RDLFlatStructGenerator
 from ..identifier_filter import kw_filter as kwf
@@ -13,6 +14,11 @@ class WBufStorageStructGenerator(RDLFlatStructGenerator):
     def __init__(self, wbuf: 'WriteBuffering') -> None:
         super().__init__()
         self.wbuf = wbuf
+
+    def enter_AddressableComponent(self, node: AddressableNode) -> WalkerAction:
+        if node.external :
+            return WalkerAction.SkipDescendants
+        return WalkerAction.Continue
 
     def get_typdef_name(self, node:'Node', suffix: str = "") -> str:
         base = node.get_rel_path(

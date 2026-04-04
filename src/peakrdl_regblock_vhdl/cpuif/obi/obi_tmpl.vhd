@@ -45,7 +45,11 @@ process({{get_always_ff_event(cpuif.reset)}}) begin
                     is_active <= '1';
                     cpuif_req <= '1';
                     cpuif_req_is_wr <= {{cpuif.signal("we")}};
+                    {%- if cpuif.data_width_bytes == 1 %}
+                    cpuif_addr <= {{cpuif.signal("addr")}}({{cpuif.addr_width-1}} downto 0);
+                    {%- else %}
                     cpuif_addr <= ({{cpuif.addr_width-1}} downto {{clog2(cpuif.data_width_bytes)}} => {{cpuif.signal("addr")}}({{cpuif.addr_width-1}} downto {{clog2(cpuif.data_width_bytes)}}), others => '0');
+                    {%- endif %}
                     cpuif_wr_data <= {{cpuif.signal("wdata")}};
                     rid_q <= {{cpuif.signal("aid")}};
                     for i in {{cpuif.signal("be")}}'RANGE loop
