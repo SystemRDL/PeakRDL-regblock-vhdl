@@ -15,7 +15,7 @@ std_logic_vector
             next_c := to_{{ logic_type(field) }}(to_unsigned(next_c) + to_unsigned({{field_logic.get_counter_incrvalue(node)}}));
         end if;
         {%- else %}
-        {{field_logic.get_field_combo_identifier(node, "overflow")}} <= to_std_logic((to_unsigned({{zero_pad("next_c")}}) + to_unsigned({{zero_pad(field_logic.get_counter_incrvalue(node))}})) > to_unsigned({{zero_pad(get_value(2**node.width - 1, node.width))}}));
+        {{field_logic.get_field_combo_identifier(node, "overflow")}} <= to_std_logic((to_unsigned({{zero_pad("next_c")}}) + to_unsigned({{zero_pad(field_logic.get_counter_incrvalue(node))}})) > to_unsigned({{zero_pad(get_value(2**node.width - 1, node.width + 1))}}));
         next_c := to_{{ logic_type(field) }}(to_unsigned(next_c) + to_unsigned({{field_logic.get_counter_incrvalue(node)}}));
         {%- endif %}
         load_next_c := '1';
