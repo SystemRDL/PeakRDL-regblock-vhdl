@@ -5,10 +5,14 @@ context ieee.ieee_std_context;
 use ieee.fixed_pkg.all;
 
 use work.{{ds.module_name}}_pkg.all;
-{%- if cpuif.package_name %}
+use work.reg_utils.all;
+{%- if cpuif.package_name and cpuif.package_library %}
+
+library {{cpuif.package_library}};
+use {{cpuif.package_library}}.{{cpuif.package_name}}.all;
+{%- elif cpuif.package_name %}
 use work.{{cpuif.package_name}}.all;
 {%- endif %}
-use work.reg_utils.all;
 
 entity {{ds.module_name}} is
     {%- if module_has_parameters() %}
