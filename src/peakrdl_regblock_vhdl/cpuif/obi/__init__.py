@@ -16,10 +16,12 @@ class OBI_Cpuif(CpuifBase):
             "s_obi_i : in obi_subordinate_in_intf(",
            f"    addr({self.addr_width-1} downto 0),",
            f"    be({self.data_width_bytes-1} downto 0),",
-           f"    wdata({self.data_width-1} downto 0)",
+           f"    wdata({self.data_width-1} downto 0),",
+            "    aid(ID_WIDTH-1 downto 0)",
             ");",
             "s_obi_o : out obi_subordinate_out_intf(",
-           f"   rdata({self.data_width-1} downto 0)",
+           f"    rdata({self.data_width-1} downto 0),",
+            "    rid(ID_WIDTH-1 downto 0)",
             ")",
         ])
 
@@ -56,6 +58,10 @@ class OBI_Cpuif(CpuifBase):
     def id_width(self) -> int:
         return 1  # Default ID width
 
+    @property
+    def parameters(self) -> List[str]:
+        return [f"ID_WIDTH : positive := {self.id_width}"]
+
 
 class OBI_Cpuif_flattened(OBI_Cpuif):
     is_interface = False
@@ -87,7 +93,3 @@ class OBI_Cpuif_flattened(OBI_Cpuif):
 
     def signal(self, name: str) -> str:
         return "s_obi_" + name
-
-    @property
-    def parameters(self) -> List[str]:
-        return ["ID_WIDTH : positive := 1"]
