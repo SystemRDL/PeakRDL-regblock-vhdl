@@ -12,7 +12,11 @@ def get_indexed_path(top_node: Node, target_node: Node) -> str:
     """
     TODO: Add words about indexing and why i'm doing this. Copy from logbook
     """
-    path = target_node.get_rel_path(top_node, empty_array_suffix="(!)")
+    path = target_node.get_rel_path(
+        top_node,
+        array_suffix="({index:d})",
+        empty_array_suffix="(!)",
+    )
 
     # replace unknown indexes with incrementing iterators i0, i1, ...
     class ReplaceUnknown:
