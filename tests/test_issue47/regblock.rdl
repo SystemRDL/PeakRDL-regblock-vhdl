@@ -1,0 +1,26 @@
+// https://github.com/SystemRDL/PeakRDL-regblock-vhdl/issues/47
+addrmap repro {
+
+    default accesswidth = 32;
+    default regwidth = 32;
+
+    reg {
+        field {
+            sw = r;
+            hw = w;
+        } endpoint_0[0:0] = 0;
+    } summary @ 0x0;
+
+    regfile {
+        reg {
+            field {
+                sw = rw;
+                hw = w;
+                woclr;
+                posedge intr;
+            } f_event[0:0] = 0;
+        } interrupt;
+    } endpoint[2] @ 0x8 += 0x4;
+
+    summary.endpoint_0->next = endpoint[0].interrupt->intr;
+};
